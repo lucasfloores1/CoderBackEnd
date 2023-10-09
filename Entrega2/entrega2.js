@@ -13,7 +13,7 @@ class ProductManager {
     async addProduct( code, title, description, price, thumbnail, stock ) {
         //Validate
         if ( !code || !title || !description || !price || !thumbnail || !stock ){
-            throw new Error('All the fields are obligatory');
+            throw new Error('All the fields are required');
         }
         //Read File
         const products = await getProductsFromFile(this.path);
@@ -122,28 +122,3 @@ const saveProductsInFile = async (path, data) => {
     const content = JSON.stringify( data, null, '\t' );
     return fs.promises.writeFile( path, content, 'utf-8' );
 }
-
-/*async function test() {
-    const pm = new ProductManager('./Products.json')
-    const data = {
-        title: 'producto prueba',
-        description: 'Este es un producto prueba',
-        price: 200,
-        thumbnail: 'Sin imagen',
-        code: 'abc123',
-        stock: 25
-    }
-    await pm.addProduct( 'abc123', 'producto prueba', 'Este es un producto prueba', 200, 'Sin imagen', 25 );
-    await pm.addProduct( '2356', 'producto prueba 2', 'Este es ', 25, 'Sin imagen 2', 2 );
-    await pm.addProduct( '4579', 'producto prueba 3', 'Este es el 3', 28, 'Sin imagen 3', 5 );
-    console.log('primer pedido de products',await pm.getProducts());
-    await pm.updateProduct(1, {description : 'Cambio de descripcion'})
-    console.log('recupero el producto actualizado',await pm.getProductById(1));
-    await pm.deleteProduct(1);
-    await pm.deleteProduct(2);
-    await pm.addProduct( '457921', 'producto prueba 4', 'Este es el 4', 28, 'Sin imagen 4', 5 );
-    console.log('tercer pedido luego de deletear y agregar id 4',await pm.getProducts());
-    console.log(await pm.getProductById(4));
-}
-
-test();*/
