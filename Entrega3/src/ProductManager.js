@@ -45,7 +45,7 @@ class ProductManager {
         //Validate
         let product = products.find( product => product.id === id );
         if(!product){
-            throw new Error('Product Not found');
+            throw new Error('Product does not exist');
         }
         if(product.code === 'deleted'){
             throw new Error('This item was deleted');
