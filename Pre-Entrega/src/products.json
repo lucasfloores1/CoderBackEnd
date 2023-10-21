@@ -1,0 +1,38 @@
+[
+	{
+		"id": "fdac4270-6872-4e4a-9595-444df042adaa",
+		"code": "deleted"
+	},
+	{
+		"id": "62a535ab-f9c1-40b6-bef4-5ec91ff5a5a8",
+		"title": "Producto 12",
+		"description": "Este es el producto 12",
+		"price": 253,
+		"thumbnail": [
+			{
+				"url": "Imagen12.com/asdiu27827827abw"
+			},
+			{
+				"url": "Imagen123.com/awdawda4rt9817ewrw"
+			}
+		],
+		"code": "785785795",
+		"stock": 10
+	},
+	{
+		"id": "59a2c092-a2a9-42c4-bf0a-c35414fdf8e3",
+		"title": "Producto 10",
+		"description": "Este es el producto 10",
+		"price": 259.99,
+		"thumbnail": [
+			{
+				"url": "Imagen10.com/asdiuabw"
+			},
+			{
+				"url": "Imagen54.com/awdawda4rtewrw"
+			}
+		],
+		"code": "78595",
+		"stock": 25
+	}
+]

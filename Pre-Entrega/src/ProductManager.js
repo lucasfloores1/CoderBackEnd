@@ -1,5 +1,6 @@
 const { log } = require('console');
 const fs = require('fs');
+const { v4 : uuidV4 } = require('uuid');
 
 class ProductManager {
     constructor( path ){
@@ -11,31 +12,28 @@ class ProductManager {
         return products;
     }
 
-    async addProduct( code, title, description, price, thumbnail, stock ) {
+    async addProduct( product ) {
         //Validate
-        if ( !code || !title || !description || !price || !thumbnail || !stock ){
+        if ( !product.code || !product.title || !product.description || !product.price || !product.thumbnail || !product.stock ){
             throw new Error('All the fields are required');
         }
         //Read File
         const products = await getProductsFromFile(this.path);
         //Validate code
-        let duplicatedProduct = products.find( product => product.code === code );
+        let duplicatedProduct = products.find( prod => prod.code === product.code );
         if ( duplicatedProduct ){
             throw new Error('Product code already exist');
         }
         //Add Product
         const newProduct = {
-            id: products.length + 1,
-            code,
-            title,
-            description,
-            price,
-            thumbnail,
-            stock,
+            id: uuidV4(),
+            ...product
         }
         products.push( newProduct );
         //Write File
         await saveProductsInFile( this.path, products );
+
+        return newProduct;
     }
 
     async getProductById( id ){
@@ -59,7 +57,7 @@ class ProductManager {
         //Validate
         const index = products.findIndex( (product) => product.id === id );
         if ( index === -1 ){
-            throw new Error('Product not found');
+            throw new Error('Product not found or missing id');
         }
         const duplicadtedCode = products.find( (product) => ( product.code === code ) );
         if ( duplicadtedCode ){
@@ -89,6 +87,8 @@ class ProductManager {
         }
         //Write File
         await saveProductsInFile( this.path, products );
+
+        return products[index];
     }
 
     async deleteProduct( id ){
@@ -108,6 +108,8 @@ class ProductManager {
         }
         //Write File
         await saveProductsInFile( this.path, products );
+
+        return 'product deleted';
     }
 }
 
