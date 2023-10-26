@@ -1,9 +1,5 @@
 [
 	{
-		"id": "fdac4270-6872-4e4a-9595-444df042adaa",
-		"code": "deleted"
-	},
-	{
 		"id": "62a535ab-f9c1-40b6-bef4-5ec91ff5a5a8",
 		"title": "Producto 12",
 		"description": "Este es el producto 12",
@@ -34,5 +30,18 @@
 		],
 		"code": "78595",
 		"stock": 25
+	},
+	{
+		"id": "5095e00e-9a99-419a-ae5f-bff856cbe9ad",
+		"title": "Máscara de pestañas",
+		"description": "Mascara de pestañas FACES Negra",
+		"price": "12000",
+		"code": "10258",
+		"stock": "10",
+		"thumbnails": [
+			"D:\\Dev\\Coder\\Entregas\\Pre-Entrega\\public\\img\\1698308449696-mascara1.jpg",
+			"D:\\Dev\\Coder\\Entregas\\Pre-Entrega\\public\\img\\1698308449697-mascara2.jpg",
+			"D:\\Dev\\Coder\\Entregas\\Pre-Entrega\\public\\img\\1698308449699-mascara3.jpg"
+		]
 	}
 ]

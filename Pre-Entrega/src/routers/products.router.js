@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const ProductManager = require('../ProductManager');
 const path = require('path');
+const { uploader } = require('../utils');
 
 const router = Router();
 
@@ -45,10 +46,13 @@ router.get( '/products/:pid', async (req, res) =>{
     }
 });
 
-router.post( '/products', async (req, res) => {
+router.post( '/products', uploader.array('thumbnails') ,async (req, res) => {
     const { body } = req
+    const files = req.files
+    const filesPaths = files.map( file => file.path );
     const newProduct = {
-        ...body
+        ...body,
+        thumbnails : filesPaths,
     }
     console.log(newProduct);
     try {

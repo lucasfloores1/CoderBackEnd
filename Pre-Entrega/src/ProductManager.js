@@ -14,7 +14,7 @@ class ProductManager {
 
     async addProduct( product ) {
         //Validate
-        if ( !product.code || !product.title || !product.description || !product.price || !product.thumbnail || !product.stock ){
+        if ( !product.code || !product.title || !product.description || !product.price || !product.stock ){
             throw new Error('All the fields are required');
         }
         //Read File
