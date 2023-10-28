@@ -34,7 +34,7 @@ router.post( '/carts/:cid/products/:pid', async (req, res) => {
     //Validate pid and cid
     try {
         const product = await pm.getProductById(pid);
-        const cart = await pm.getCartById(cid);
+        const cart = await cm.getCartById(cid);
         const updatedCart = await cm.addProductToCart( cart.id, product.id );
         res.send(updatedCart);
     } catch (error) {
