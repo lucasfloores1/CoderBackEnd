@@ -4,11 +4,6 @@ import CartManager from '../CartManager.js';
 import ProductManager from '../ProductManager.js';
 import { __dirname } from '../utils.js';
 
-// const { Router } = require('express');
-// const path = require('path')
-// const CartManager = require('../CartManager');
-// const ProductManager = require('../ProductManager');
-
 const router = Router();
 
 //Instancia de CartManager y ProductManager
@@ -48,5 +43,4 @@ router.post( '/carts/:cid/products/:pid', async (req, res) => {
     }
 });
 
-//module.exports = router;
 export default router;

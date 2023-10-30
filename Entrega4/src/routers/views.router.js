@@ -3,10 +3,6 @@ import path from 'path';
 import ProductManager from '../ProductManager.js';
 import { __dirname } from '../utils.js';
 
-// const { Router } = require('express');
-// const ProductManager = require('../ProductManager');
-// const path = require('path');
-
 const router = Router();
 
 //Instancia de ProductManager
@@ -30,5 +26,4 @@ router.get('/realtimeproducts', async (req, res) => {
   }
 })
 
-//module.exports = router;
 export default router;

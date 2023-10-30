@@ -2,9 +2,6 @@ import multer from 'multer';
 import path from 'path';
 import url from 'url';
 
-// const multer = require('multer');
-// const path = require('path');
-
 //dirname
 const __filename = url.fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
@@ -22,6 +19,3 @@ const storage = multer.diskStorage({
 });
 
 export const uploader = multer({ storage });
-// module.exports = {
-//     uploader : multer({ storage })
-// };

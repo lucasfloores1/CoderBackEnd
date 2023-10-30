@@ -6,13 +6,6 @@ import productsRoter from './routers/products.router.js'
 import cartsRouter from './routers/carts.router.js'
 import viewsRouter from './routers/views.router.js'
 
-// const express = require('express');
-// const path = require('path');
-// const handlebars = require('express-handlebars');
-// const productsRouter = require('./routers/products.router');
-// const cartsRouter = require('./routers/carts.router');
-// const homeRouter = require('./routers/home.router');
-
 const app = express();
 
 app.use(express.json());
@@ -31,9 +24,5 @@ app.use((error, req, res, next) => {
     console.error(message);
     res.status(500).json({ message });
 });
-
-// app.listen(PORT, () =>{
-//     console.log(`Server Running into hhtp://localhost:${PORT}`);
-// });
 
 export default app;

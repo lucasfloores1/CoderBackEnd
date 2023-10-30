@@ -3,8 +3,6 @@ import { v4 as uuidV4 } from 'uuid';
 import path from 'path';
 import { __dirname } from './utils.js';
 
-//const fs = require('fs');
-//const { v4 : uuidV4 } = require('uuid');
 
 class ProductManager {
     constructor( path ){
@@ -137,5 +135,4 @@ const saveProductsInFile = async (path, data) => {
     return fs.promises.writeFile( path, content, 'utf-8' );
 }
 
-//module.exports = ProductManager;
 export default ProductManager;

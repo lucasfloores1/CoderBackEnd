@@ -1,9 +1,6 @@
 import fs from 'fs';
 import { v4 as uuidV4 } from 'uuid';
 
-// const fs = require('fs');
-// const { v4 : uuidV4 } = require('uuid');
-
 class CartManager {
 
     constructor( path ){
@@ -77,5 +74,4 @@ const saveCartsInFile = async (path, data) => {
     return fs.promises.writeFile( path, content, 'utf-8' );
 }
 
-//module.exports = CartManager;
 export default CartManager;

@@ -5,10 +5,6 @@ import ProductManager from '../ProductManager.js';
 import { __dirname } from '../utils.js';
 import { emit } from '../socket.js';
 
-// const { Router } = require('express');
-// const ProductManager = require('../ProductManager');
-// const path = require('path');
-// const { uploader } = require('../utils');
 
 const router = Router();
 
@@ -93,5 +89,4 @@ router.delete( '/products/:pid', async (req, res) => {
     }
 });
 
-//module.exports = router;
 export default router;
