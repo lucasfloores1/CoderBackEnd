@@ -1,0 +1,18 @@
+<h1>Products List</h1>
+{{#each products}}
+<article>
+    <header>{{this.title}}</header>
+    {{this.description}}.<br>
+    <div class="grid">
+        {{#each this.thumbnails}}
+        <div class="thumbnails_img">
+            <img src="{{this}}" alt="{{this.title}} {{@index}}"><br>
+        </div>
+        {{/each}}
+    </div>
+    <footer>
+        ${{this.price}}<br>
+        There are {{this.stock}} units left.
+    </footer>
+</article>
+{{/each}}

@@ -1,0 +1,22 @@
+<h1>Real Time Products List</h1>
+<div id="productsContainer">
+    {{#each products}}
+    <article id="{{code}}">
+        <header class="title">{{this.title}}</header>
+        <div class="description">{{this.description}}.</div>
+        <div class="grid">
+            {{#each this.thumbnails}}
+            <div class="thumbnails_img">
+                <img src="{{this}}" alt="{{this.title}} {{@index}}"><br>
+            </div>
+            {{/each}}
+        </div>
+        <footer>
+            ${{this.price}}<br>
+            There are {{this.stock}} units left.
+        </footer>
+    </article>
+    {{/each}}
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/realtimeproducts.js"></script>
