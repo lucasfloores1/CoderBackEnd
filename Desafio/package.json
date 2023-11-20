@@ -1,0 +1,23 @@
+{
+  "name": "entrega4",
+  "version": "1.0.0",
+  "description": "handlebars y websockets",
+  "main": "./src/server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon .",
+    "start": "node ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@picocss/pico": "^1.5.10",
+    "express": "^4.18.2",
+    "express-handlebars": "^7.1.2",
+    "mongoose": "^8.0.1",
+    "multer-express-middleware": "^0.0.3",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.1"
+  }
+}
