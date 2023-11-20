@@ -27,19 +27,14 @@ export default class CartsManager {
             const existingProduct = cart.products.find((product) => product._id === pid);
     
             if (!existingProduct) {
-                console.log('Agregando producto');
                 cart.products.push({ _id: pid, quantity: 1 });
             } else {
-                console.log('Incrementando cantidad');
                 existingProduct.quantity++;
             }
-    
-            await cart.save(); // Asegúrate de esperar a que se complete la operación de guardar
-    
-            console.log(cart);
+            await cart.save();
             return cart;
         } catch (error) {
-            console.error('Error al agregar producto al carrito:', error);
+            console.error('There was an error while adding the product:', error);
             throw error;
         }
     }
