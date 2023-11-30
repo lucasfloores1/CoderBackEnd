@@ -1,0 +1,29 @@
+<h1>Lista de productos</h1>
+
+<article>
+  <table>
+    <tr>
+      <th>Titulo</th>
+      <th>Descripccion</th>
+      <th>Precio</th>
+      <th>Stock</th>
+      <th>Categoria</th>
+      <th>Codigo</th>
+    </tr>
+    <tbody>
+      {{#each payload}}
+        <tr>
+          <td>{{this.title}}</td>
+          <td>{{this.description}}</td>
+          <td>${{this.price}}</td>
+          <td>{{this.stock}}</td>
+          <td>{{this.type}}</td>
+          <td>{{this.code}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <p>Página actual: {{page}}</p>
+  <a href="{{prevLink}}" role="button" {{#unless hasPrevPage}}disabled{{/unless}} >Anterior</a>
+  <a href="{{nextLink}}" role="button" {{#unless hasNextPage}}disabled{{/unless}} >Siguiente</a>
+</article>
