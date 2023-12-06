@@ -47,7 +47,7 @@ router.post( '/products', uploader.array('thumbnails') ,async (req, res) => {
     const filesPaths = files.map( file => file.path );
     const newProduct = {
         ...body,
-        thumbnails: filesPaths.map(filePath => filePath.replace(/\\/g, '/').replace(/.*img/, imgPath)),
+        thumbnails: filesPaths.map(filePath => filePath.replace(/\\/g, '/').replace(/.*img/, imgPath)) || `/img/default-product.jpg`,
     }
     try {
         const createdProduct = await ProductsManager.create(newProduct);

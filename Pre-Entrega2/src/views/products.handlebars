@@ -1,5 +1,12 @@
 <h1>Lista de productos</h1>
-
+<article>
+  {{#if user.isAdmin }}
+  <h2>Welcome Admin {{user.first_name}} {{user.last_name}}</h2>
+  {{else}}
+  <h2>Welcome User {{user.first_name}} {{user.last_name}}</h2>
+  {{/if}}
+  <a href="/api/sessions/logout">Log Out</a>
+</article>
 <article>
   <table>
     <tr>

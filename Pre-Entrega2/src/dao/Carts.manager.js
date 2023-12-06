@@ -1,5 +1,4 @@
 import CartModel from '../models/cart.model.js'
-import productModel from '../models/product.model.js';
 
 export default class CartsManager {
     static get() {

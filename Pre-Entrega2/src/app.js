@@ -2,12 +2,30 @@ import express from 'express';
 import path from 'path';
 import { __dirname } from './utils.js';
 import handlebars from 'express-handlebars';
-import productsRoter from './routers/products.router.js'
-import cartsRouter from './routers/carts.router.js'
-import viewsRouter from './routers/views.router.js'
+import cookieParser from 'cookie-parser';
+import sessions from 'express-session';
+import MongoStorage from 'connect-mongo'
+import productsRoter from './routers/products.router.js';
+import cartsRouter from './routers/carts.router.js';
+import viewsRouter from './routers/views.router.js';
+import sessionsRouter from './routers/sessions.router.js'
+import { URI } from './db/mongodb.js';
 
 const app = express();
 
+const SECRET_KEY = `a0A9U9qUkEwc`;
+
+app.use(cookieParser(SECRET_KEY));
+app.use(sessions({
+    store : MongoStorage.create({
+        mongoUrl: URI,
+        mongoOptions: {},
+        ttl : 60*30,
+    }),
+    secret : SECRET_KEY,
+    resave : true,
+    saveUninitialized : true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
@@ -16,7 +34,7 @@ app.engine('handlebars', handlebars.engine());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'handlebars');
 
-app.use('/api', productsRoter, cartsRouter);
+app.use('/api', productsRoter, cartsRouter, sessionsRouter);
 app.use('/', viewsRouter);
 
 app.use((error, req, res, next) => {
