@@ -45,5 +45,7 @@ export const buildResponsePaginated = (data, baseUrl = URL_BASE) => {
       prevLink: data.hasPrevPage ? `${baseUrl}/products?limit=${data.limit}&page=${data.prevPage}` : null,
       //nextLink: Link directo a la página siguiente (null si hasNextPage=false)
       nextLink: data.hasNextPage ? `${baseUrl}/products?limit=${data.limit}&page=${data.nextPage}` : null,
+      //hasPages: Ayuda para renderizar paginacion en handlebars
+      hasPagination: data.hasNextPage || data.hasPrevPage,
     };  
   };

@@ -17,7 +17,7 @@ export default class ProductsManager {
     }
     static async create(product) {
         //Validate
-        if ( !product.code || !product.title || !product.description || !product.price || !product.stock ){
+        if ( !product.code || !product.title || !product.description || !product.price || !product.stock || !product.type ){
             throw new Error('All the fields are required');
         }
         //Validate code

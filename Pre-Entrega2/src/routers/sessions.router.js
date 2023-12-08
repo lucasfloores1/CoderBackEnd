@@ -21,7 +21,7 @@ router.post('/sessions/register', async (req,res) => {
         !email ||
         !password
     ){
-        return res.render('error', { title : 'Error', errorMessage : `All fields are required` })
+        return res.render('error', { title : 'Error' })
     }
     const user = await userModel.create({
         first_name,
@@ -37,14 +37,14 @@ router.post('/sessions/register', async (req,res) => {
 router.post('/sessions/login', async (req, res) => {
     const { body : { email, password } } = req;
     if ( !email || !password ){
-        return res.render('error', { title : 'Error', errorMessage : `All fields are required` })
+        return res.render('../views/error.handlebars', { title : 'Error' })
     }
     const user = await userModel.findOne({ email : email });
     if (!user){
-        return res.render('error', { title : 'Error', errorMessage : `email or password are wrong` })
+        return res.render('../views/error.handlebars', { title : 'Error' })
     }
     if (user.password !== password){
-        return res.render('error', { title : 'Error', errorMessage : `email or password are wrong` })
+        return res.render('../views/error.handlebars', { title : 'Error' })
     }
     const {
         first_name,
@@ -64,7 +64,7 @@ router.post('/sessions/login', async (req, res) => {
 router.get('/sessions/logout', (req, res) => {
     req.session.destroy((error) => {
         if (error) {
-            return res.render('error', { title: 'Error', messageError: error.message });
+            return res.render('error', { title: 'Error' });
         }
         res.redirect('/login');
     });
