@@ -1,7 +1,8 @@
 import multer from 'multer';
-import path from 'path';
+import path, { resolve } from 'path';
 import url from 'url';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export const URL_BASE = 'http://localhost:8080/api';
 
@@ -14,7 +15,29 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 
 export const isValidPassword = (password, user) => bcrypt.compareSync( password, user.password );
 
+//jwt
+const JWT_SECRET = '£0LD@F**3@3~H8WjK7@Reu6H.?-->tC=';
+export const generateToken = (user) => {
+    const payload = {
+        id : user._id,
+        username : user.username,
+        email : user.email,
+        role : user.role,
+    }
+    const token = jwt.sign( payload, JWT_SECRET, { expiresIn : '1m' } );
+    return token;
+};
 
+export const verifyToken = (token) => {
+    return new Promise((resolve) => {
+        jwt.verify(token, JWT_SECRET, (error, payload) => {
+            if (error) {
+                return resolve(false);
+            }
+            resolve(payload);
+        });
+    });
+};
 
 //multer
 const storage = multer.diskStorage({

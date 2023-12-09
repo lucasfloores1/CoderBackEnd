@@ -50,7 +50,7 @@ export const init = () => {
         if (!user) {
             return done(new Error( 'email or password are wrong' ));
         }
-        const isNotValidPw = isValidPassword(password, user);
+        const isNotValidPw = !isValidPassword(password, user);
         if (isNotValidPw) {
             return done(new Error( 'email or password are wrong' ));
         }

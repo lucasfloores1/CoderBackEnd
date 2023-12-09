@@ -5,7 +5,7 @@ import { __dirname } from '../utils.js';
 import ProductsManager from '../dao/Products.manager.js';
 import productModel from '../models/product.model.js';
 import { buildResponsePaginated } from '../utils.js';
-
+import { verifyToken } from '../utils.js';
 const router = Router();
 
 /*//Instancia de ProductManager
@@ -40,6 +40,11 @@ router.get('/', async (req, res) => {
 router.get('/products', async (req, res) => {
   try {
     const { limit = 10, page = 1, sort, search } = req.query;
+    /*
+    JWT Log In No entraba en esta entrega pero queria hacerlo}
+        const token = req.cookies.access_token;
+    const user = await verifyToken(token);
+    */
     //validate login
     if (!req.user) {
       return res.redirect('/login');
