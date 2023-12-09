@@ -41,13 +41,14 @@ router.get('/products', async (req, res) => {
   try {
     const { limit = 10, page = 1, sort, search } = req.query;
     //validate login
-    if (!req.session.user) {
+    if (!req.user) {
       return res.redirect('/login');
     }
-    const user = {
-      ...req.session.user,
-      isAdmin : req.session.user.role === 'admin'
+    const dataUser = {
+      ...req.user,
+      isAdmin : req.user.role === 'admin'
     }
+    const user = dataUser._doc;
     // sort esta asociado al campo price. Ademas los posibles valores son asc y desc
     // search esta asociado al campo type
     const criteria = {};
@@ -62,10 +63,10 @@ router.get('/products', async (req, res) => {
     const baseUrl = 'http://localhost:8080';
     const data = buildResponsePaginated({ ...result, sort, search }, baseUrl);
     //render
-    if ( req.session.user.role === 'admin' ){
+    if ( req.user.role === 'admin' ){
       return res.render('productsAdmin', {title: 'Admin Products Table', ...data, user})
     }
-     return res.render('products', { title: 'Products List', ...data , user});
+     return res.render('products', { title: 'Products List', ...data , user });
   } catch (error) {
     return res.render('error', { title : 'Error Page', errorMessage: error.message })
   }
@@ -94,6 +95,10 @@ router.get('/login', async (req, res) =>{
 
 router.get('/register', async (req, res) =>{
   res.render('register', { title : 'Register' });
+});
+
+router.get('/restore-password', async (req, res) =>{
+  res.render('restore-pw', { title : 'Restore Password' });
 });
 
 export default router;

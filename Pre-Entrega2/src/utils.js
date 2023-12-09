@@ -1,12 +1,20 @@
 import multer from 'multer';
 import path from 'path';
 import url from 'url';
+import bcrypt from 'bcrypt';
 
 export const URL_BASE = 'http://localhost:8080/api';
 
 //dirname
 const __filename = url.fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+
+//hash
+export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
+export const isValidPassword = (password, user) => bcrypt.compareSync( password, user.password );
+
+
 
 //multer
 const storage = multer.diskStorage({

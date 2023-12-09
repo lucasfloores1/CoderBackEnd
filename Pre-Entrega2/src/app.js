@@ -4,6 +4,8 @@ import { __dirname } from './utils.js';
 import handlebars from 'express-handlebars';
 import cookieParser from 'cookie-parser';
 import sessions from 'express-session';
+import passport from 'passport';
+import { init as passportInit } from './config/passport.config.js';
 import MongoStorage from 'connect-mongo'
 import productsRoter from './routers/products.router.js';
 import cartsRouter from './routers/carts.router.js';
@@ -32,8 +34,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.engine('handlebars', handlebars.engine());
 app.set('views', path.join(__dirname, 'views'));
-console.log(path.join(__dirname, 'views'));
 app.set('view engine', 'handlebars');
+
+passportInit();
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api', productsRoter, cartsRouter, sessionsRouter);
 app.use('/', viewsRouter);
