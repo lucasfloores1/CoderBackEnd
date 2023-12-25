@@ -3,23 +3,23 @@ import path from 'path';
 import { __dirname } from './utils.js';
 import handlebars from 'express-handlebars';
 import cookieParser from 'cookie-parser';
-import sessions from 'express-session';
+/*import sessions from 'express-session';
+import MongoStorage from 'connect-mongo'*/
 import passport from 'passport';
 import { init as passportInit } from './config/passport.config.js';
-import MongoStorage from 'connect-mongo'
 import productsRoter from './routers/products.router.js';
 import cartsRouter from './routers/carts.router.js';
 import viewsRouter from './routers/views.router.js';
 import sessionsRouter from './routers/sessions.router.js'
 import authRouter from './routers/auth.router.js'
-import { URI } from './db/mongodb.js';
+/*import { URI } from './db/mongodb.js';*/
 
 const app = express();
 
 const SECRET_KEY = `a0A9U9qUkEwc`;
 
 app.use(cookieParser(SECRET_KEY));
-app.use(sessions({
+/*app.use(sessions({
     store : MongoStorage.create({
         mongoUrl: URI,
         mongoOptions: {},
@@ -28,7 +28,7 @@ app.use(sessions({
     secret : SECRET_KEY,
     resave : true,
     saveUninitialized : true,
-}));
+}));*/
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
@@ -39,7 +39,6 @@ app.set('view engine', 'handlebars');
 
 passportInit();
 app.use(passport.initialize());
-app.use(passport.session());
 
 app.use('/api', productsRoter, cartsRouter, sessionsRouter, authRouter);
 app.use('/', viewsRouter);

@@ -1,37 +1,85 @@
 import { Router } from "express";
-import userModel from '../models/user.model.js'
-import { createHash, isValidPassword, generateToken, verifyToken } from "../utils.js";
+import { isValidPassword, generateToken, authMiddleware } from "../utils.js";
+import passport from "passport";
+import userModel from "../models/user.model.js";
 
 const router = Router();
 
-export const jwtAuth = async (req, res, next) => {
-    const { headers : { authorization : token } } = req;
-    const payload = await verifyToken( token );
-    if (!payload) {
-        res.status(401).json({ message : 'User does not have enough permissions' })
-    }
-    req.user = payload;
-    next();
-};
-
+//Local Login
 router.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({ email });
     if (!user) {
-        res.status(401).json({ message : 'User not found' })
+        return res.status(401).json({ message: 'Email or password are wrong' });
     }
     const isNotValidPassword = !isValidPassword(password, user);
     if (isNotValidPassword) {
         res.status(401).json({ message : 'email or password are wrong' })
     }
     const token = generateToken(user);
-    res.cookie('access_token', token, { httpOnly: true });
-    //res.status(200).json({ access_token : token });
-    res.redirect('/products');
+    res.cookie('accessToken', token, {
+        maxAge: 12 * 60 * 60 * 1000,//12 hours
+        httpOnly: true,
+    });
+    return res.redirect('/products');
 });
 
-router.post('/auth/register', async (req, res) => {
+//Local Register
+router.post('/auth/register', passport.authenticate('register', { session: false }), async (req, res) => {
+    try {
+      res.redirect('/login');
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
 
+//Github
+router.get('/sessions/github', passport.authenticate('github', { scope: ['user:email']}));
+
+router.get('/sessions/github/callback', passport.authenticate('github', { session: false }), (req, res) => {
+  try {
+    const token = generateToken(req.user);
+    res.cookie('token', token, {
+        maxAge: 12 * 60 * 60 * 1000,//12 hours
+        httpOnly: true,
+      })
+    .status(200)
+    .json({ status: 'success' });
+    res.redirect('/products');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//Restore password
+router.post('/auth/restore-password', async (req,res) => {
+    const { body : { email, password } } = req;
+    if ( !email || !password ){
+        return res.render('../views/error.handlebars', { title : 'Error' })
+    }
+    const user = await userModel.findOne({ email : email });
+    if (!user){
+        return res.render('../views/error.handlebars', { title : 'Error' })
+    }
+    user.password = createHash(password);
+    await userModel.updateOne({ email }, user);
+    res.redirect('/login')
+});
+
+//Current
+router.get('/auth/current', authMiddleware('jwt'), async (req, res) => {
+    if (req.user) {
+        res.status(200).json({ user : req.user })
+    } else {
+        res.status(500).send({ error : 'There was an error getting your user' })
+    }
+});
+
+//Logout
+router.get('/auth/logout', (req, res) => {
+  res.clearCookie('accessToken');
+  req.user = null;
+  res.redirect('/login');
 });
 
 export default router;

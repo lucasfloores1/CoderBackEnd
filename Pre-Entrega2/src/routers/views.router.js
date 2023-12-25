@@ -1,24 +1,22 @@
 import { Router } from 'express';
-import path from 'path';
 /*import ProductManager from '../ProductManager.js';*/
-import { __dirname } from '../utils.js';
+import { __dirname, authMiddleware } from '../utils.js';
 import ProductsManager from '../dao/Products.manager.js';
 import productModel from '../models/product.model.js';
 import { buildResponsePaginated } from '../utils.js';
-import { verifyToken } from '../utils.js';
 const router = Router();
 
 /*//Instancia de ProductManager
 const pm = new ProductManager(path.join(__dirname,'./products.json'));*/
 
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware('jwt'), async (req, res) => {
   try {
-    if (!req.session.user) {
+    if (!req.user) {
       return res.redirect('/login');
     }
     const user = {
-      ...req.session.user,
-      isAdmin : req.session.user.role === 'admin'
+      ...req.user,
+      isAdmin : req.user.role === 'admin'
     }
     const products = await ProductsManager.get();
     //formating data
@@ -26,9 +24,8 @@ router.get('/', async (req, res) => {
       title: 'Products List',
       products: products.map(product => ({ ...product.toObject() })),
     };
-    console.log(templateData.products);
     //render
-    if ( req.session.user.role === 'admin' ){
+    if ( req.user.role === 'admin' ){
       res.render('productsAdmin', templateData, user)
     }
     res.render('index', templateData);
@@ -37,23 +34,18 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/products', async (req, res) => {
+router.get('/products', authMiddleware('jwt'), async (req, res) => {
   try {
     const { limit = 10, page = 1, sort, search } = req.query;
-    /*
-    JWT Log In No entraba en esta entrega pero queria hacerlo}
-        const token = req.cookies.access_token;
-    const user = await verifyToken(token);
-    */
     //validate login
     if (!req.user) {
       return res.redirect('/login');
     }
-    const dataUser = {
+    const user = {
       ...req.user,
       isAdmin : req.user.role === 'admin'
     }
-    const user = dataUser._doc;
+    console.log(user);
     // sort esta asociado al campo price. Ademas los posibles valores son asc y desc
     // search esta asociado al campo type
     const criteria = {};
