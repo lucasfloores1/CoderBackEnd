@@ -12,7 +12,6 @@ import cartsRouter from './routers/carts.router.js';
 import viewsRouter from './routers/views.router.js';
 import sessionsRouter from './routers/sessions.router.js'
 import authRouter from './routers/auth.router.js'
-/*import { URI } from './db/mongodb.js';*/
 
 const app = express();
 
@@ -40,7 +39,7 @@ app.set('view engine', 'handlebars');
 passportInit();
 app.use(passport.initialize());
 
-app.use('/api', productsRoter, cartsRouter, sessionsRouter, authRouter);
+app.use('/api', productsRoter, cartsRouter, authRouter);
 app.use('/', viewsRouter);
 
 app.use((error, req, res, next) => {

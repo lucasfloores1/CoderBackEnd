@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware } from "../utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash } from "../utils.js";
 import passport from "passport";
 import userModel from "../models/user.model.js";
 
@@ -39,12 +39,10 @@ router.get('/sessions/github', passport.authenticate('github', { scope: ['user:e
 router.get('/sessions/github/callback', passport.authenticate('github', { session: false }), (req, res) => {
   try {
     const token = generateToken(req.user);
-    res.cookie('token', token, {
+    res.cookie('accessToken', token, {
         maxAge: 12 * 60 * 60 * 1000,//12 hours
         httpOnly: true,
-      })
-    .status(200)
-    .json({ status: 'success' });
+    });
     res.redirect('/products');
   } catch (error) {
     res.status(500).json({ error: error.message });
