@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware, createHash } from "../utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash } from "../../utils.js";
 import passport from "passport";
-import userModel from "../models/user.model.js";
+import userService from '../../services/users.service.js';
 
 const router = Router();
 
 //Local Login
 router.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = await userModel.findOne({ email });
+    const user = await userService.getByEmail(email);
     if (!user) {
         return res.status(401).json({ message: 'Email or password are wrong' });
     }
@@ -55,12 +55,12 @@ router.post('/auth/restore-password', async (req,res) => {
     if ( !email || !password ){
         return res.render('../views/error.handlebars', { title : 'Error' })
     }
-    const user = await userModel.findOne({ email : email });
+    const user = await userService.getByEmail(email);
     if (!user){
         return res.render('../views/error.handlebars', { title : 'Error' })
     }
     user.password = createHash(password);
-    await userModel.updateOne({ email }, user);
+    await userService.updateByEmail(email, user);
     res.redirect('/login')
 });
 

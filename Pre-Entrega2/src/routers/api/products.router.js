@@ -1,12 +1,10 @@
 import { Router } from 'express';
-import { uploader } from '../utils.js';
 /*import path from 'path';
 import ProductManager from '../ProductManager.js';*/
-import { __dirname } from '../utils.js';
-import { emit } from '../socket.js';
-import ProductsManager from '../dao/Products.manager.js';
-import productModel from '../models/product.model.js';
-import { buildResponsePaginated } from '../utils.js';
+import { emit } from '../../socket.js';
+import ProductsManager from '../../controllers/products.controller.js';
+import productModel from '../../dao/models/product.model.js';
+import { buildResponsePaginated, uploader, __dirname } from '../../utils.js';
 
 
 const router = Router();

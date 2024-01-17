@@ -1,13 +1,13 @@
-import CartModel from '../models/cart.model.js'
+import CartsService from '../services/carts.service.js';
 
 export default class CartsManager {
     static get() {
-        return CartModel.find();
+        return CartsService.getAll();
     }
 
     static async getById(cid){
         try {
-            const cart = await CartModel.findOne({ _id: cid });
+            const cart = await CartsService.getById(cid);
             return cart;
         } catch (error) {
             throw new Error('Cart not found');
@@ -18,13 +18,13 @@ export default class CartsManager {
         const data = {
             products : []
         };
-        const cart = await CartModel.create(data);
+        const cart = await CartsService.create(data);
         return cart;
     }
 
     static async addProductToCart(cid, pid) {
         try {
-            const cart = await CartModel.findById(cid);
+            const cart = await CartsService.getById(cid);
             const existingProduct = cart.products.find((product) => product.product._id.toString() === pid );  
             if (!existingProduct) {
                 const newProduct = {
@@ -37,7 +37,7 @@ export default class CartsManager {
                 existingProduct.quantity++;
             }
             await cart.save();
-            const updatedCart = await CartModel.findById(cid);
+            const updatedCart = await CartsService.getById(cid);
             return updatedCart;
         } catch (error) {
             console.error('There was an error while adding the product:', error);
@@ -47,7 +47,7 @@ export default class CartsManager {
 
     static async deleteProductFromCart( cid, pid ){
         try {
-            const cart = await CartModel.findById(cid);
+            const cart = await CartsService.getById(cid);
             const existingProductIndex = cart.products.findIndex((product) => product._id === pid);
 
             if (existingProductIndex === -1) {
@@ -64,7 +64,7 @@ export default class CartsManager {
 
     static async deleteAllProductsFromCart( cid ){
         try {
-            const cart = await CartModel.findById(cid);
+            const cart = await CartsService.getById(cid);
 
             if (!cart){
                 throw new Error('Cart does not exist');
@@ -80,7 +80,7 @@ export default class CartsManager {
 
     static async updateQuantityOfProdcut ( cid, pid, quantity ){
         try {
-            const cart = await CartModel.findById(cid);
+            const cart = await CartsService.getById(cid);
             const existingProduct = cart.products.find((product) => product._id === pid);
     
             if (!existingProduct) {

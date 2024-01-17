@@ -3,8 +3,8 @@ import { Router } from 'express';
 import CartManager from '../CartManager.js';
 import ProductManager from '../ProductManager.js';
 import { __dirname } from '../utils.js';*/
-import CartsManager from '../dao/Carts.manager.js';
-import ProductsManager from '../dao/Products.manager.js';
+import CartsManager from '../../controllers/carts.controller.js';
+import ProductsManager from '../../controllers/products.controller.js';
 
 const router = Router();
 

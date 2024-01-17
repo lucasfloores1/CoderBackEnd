@@ -7,17 +7,17 @@ import cookieParser from 'cookie-parser';
 import MongoStorage from 'connect-mongo'*/
 import passport from 'passport';
 import { init as passportInit } from './config/passport.config.js';
-import productsRoter from './routers/products.router.js';
-import cartsRouter from './routers/carts.router.js';
-import viewsRouter from './routers/views.router.js';
-import sessionsRouter from './routers/sessions.router.js'
-import authRouter from './routers/auth.router.js'
+import productsRoter from './routers/api/products.router.js';
+import cartsRouter from './routers/api/carts.router.js';
+import viewsRouter from './routers/views/views.router.js';
+import config from './config/config.js';
+import authRouter from './routers/api/auth.router.js'
 
 const app = express();
 
-const SECRET_KEY = `a0A9U9qUkEwc`;
+//const SECRET_KEY = `a0A9U9qUkEwc`;
 
-app.use(cookieParser(SECRET_KEY));
+app.use(cookieParser(config.cookie_secret));
 /*app.use(sessions({
     store : MongoStorage.create({
         mongoUrl: URI,

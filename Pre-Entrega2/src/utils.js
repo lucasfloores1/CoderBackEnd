@@ -4,6 +4,7 @@ import url from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
+import config from './config/config.js';
 
 export const URL_BASE = 'http://localhost:8080/api';
 
@@ -17,7 +18,6 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 export const isValidPassword = (password, user) => bcrypt.compareSync( password, user.password );
 
 //jwt
-export const JWT_SECRET = '£0LD@F**3@3~H8WjK7@Reu6H.?-->tC=';
 
 export const generateToken = (user) => {
     const payload = {
@@ -27,13 +27,13 @@ export const generateToken = (user) => {
         role : user.role,
         name : `${user.first_name} ${user.last_name}`
     }
-    const token = jwt.sign( payload, JWT_SECRET, { expiresIn : '5m' } );
+    const token = jwt.sign( payload, config.jwt_secret, { expiresIn : '5m' } );
     return token;
 };
 
 export const verifyToken = (token) => {
     return new Promise((resolve) => {
-        jwt.verify(token, JWT_SECRET, (error, payload) => {
+        jwt.verify(token, config.jwt_secret, (error, payload) => {
             if (error) {
                 return resolve(false);
             }

@@ -2,9 +2,10 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GithubStrategy } from 'passport-github2';
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
-import userModel from '../models/user.model.js';
-import { createHash, JWT_SECRET } from '../utils.js';
-import CartsManager from '../dao/Carts.manager.js';
+import userModel from '../dao/models/user.model.js';
+import { createHash } from '../utils.js';
+import CartsManager from '../controllers/carts.controller.js';
+import config from './config.js';
 
 
 export const init = () => {
@@ -60,7 +61,7 @@ export const init = () => {
     };
 
     const jwtOptions = {
-        secretOrKey : JWT_SECRET,
+        secretOrKey : config.jwt_secret,
         jwtFromRequest : ExtractJwt.fromExtractors([cookieExtractor]),
     }
 
@@ -70,8 +71,8 @@ export const init = () => {
 
     //Github
     const githubOpts = {
-        clientID: 'Iv1.f3cec4f4d6afe0ba',
-        clientSecret: '1cf0cdb71841f8da0318f0277276c1eb6ab76080',
+        clientID: config.github_client_id,
+        clientSecret: config.github_secret_key,
         callbackURL : 'http://localhost:8080/api/sessions/github/callback',
     }
     passport.use('github', new GithubStrategy(githubOpts, async (accesstoken, refreshToken, profile, done) => {
