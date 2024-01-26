@@ -5,6 +5,10 @@ export default class CartDaoMongoDB {
         return cartModel.find(criteria);
     }
 
+    static getById(cid) {
+        return cartModel.findById(cid);
+    }
+
     static create(data) {
         return cartModel.create(data);
     }

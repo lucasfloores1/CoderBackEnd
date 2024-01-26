@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
-
-export const URI = 'mongodb+srv://lucasfloores1:8TMgHT9GSg1nG1u1@cluster0.e1puumx.mongodb.net/ecommerce';
+import config from '../config/config.js';
 
 export const init = async () => {
   try {
+    const URI = config.mongodb_uri;
     await mongoose.connect(URI);
-    console.log('Database connected susscessfully 🚀');
+    console.log('Database connected 🚀');
   } catch (error) {
-    console.error('Ocurrio un error al intenter conectarnos a la base de datos 😨');
+    console.error('Error to connect to database', error.message);
   }
-}
+};

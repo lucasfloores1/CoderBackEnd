@@ -1,28 +1,27 @@
-import ProductDao from '../dao/product.dao.js'
+import { productsRepository } from "../repositories/index.js";
 
 export default class ProductsService {
     static getAll (filter = {}) {
-        return ProductDao.getAll(filter);
+        return productsRepository.getAll(filter);
     }
 
-    static async getById(pid) {
-        const result = await ProductDao.getAll({ _id : pid });
-        return result[0];
+    static getById(pid) {
+        return productsRepository.getById(pid);
     }
 
-    static getPaginated( criteria, options ) {
-        return ProductDao.getPagiantedProducts(criteria, options);
+    static getPaginatedProducts( criteria, options ) {
+        return productsRepository.getPaginatedProducts(criteria, options);
     }
 
     static create(data) {
-        return ProductDao.create(data);
+        return productsRepository.create(data);
     }
 
     static updateById(pid, data) {
-        return ProductDao.updateById(pid, data);
+        return productsRepository.updateById(pid, data);
     }
 
     static deleteById(pid) {
-        return ProductDao.deleteById(pid);
+        return productsRepository.deleteById(pid);
     }
 }

@@ -5,7 +5,11 @@ export default class ProductDaoMongoDB {
         return productModel.find(criteria);
     }
 
-    static getPagiantedProducts(criteria, options) {
+    static getById(pid) {
+        return productModel.findById(pid);
+    }
+
+    static getPaginatedProducts(criteria, options) {
         return productModel.paginate(criteria, options)
     }
 

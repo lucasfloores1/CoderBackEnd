@@ -5,6 +5,14 @@ export default class UserDaoMongoDB {
         return userModel.find(criteria);
     }
 
+    static getById(uid) {
+        return userModel.findById(uid);
+    }
+
+    static getByEmail(email) {
+        return userModel.findOne({ email })
+    }
+
     static create(data) {
         return userModel.create(data);
     }

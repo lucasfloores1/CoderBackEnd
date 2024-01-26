@@ -5,12 +5,16 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import config from './config/config.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const URL_BASE = 'http://localhost:8080/api';
 
 //dirname
 const __filename = url.fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+
+//ticket code
+export const createTicketCode = uuidv4();
 
 //hash
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -27,7 +31,7 @@ export const generateToken = (user) => {
         role : user.role,
         name : `${user.first_name} ${user.last_name}`
     }
-    const token = jwt.sign( payload, config.jwt_secret, { expiresIn : '5m' } );
+    const token = jwt.sign( payload, config.jwt_secret, { expiresIn : '5h' } );
     return token;
 };
 

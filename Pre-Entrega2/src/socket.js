@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 
 import MessageModel from './dao/models/message.model.js';
+import { authMiddleware, authRole } from './utils.js';
 
 let io;
 
@@ -12,7 +13,7 @@ export const init = ( httpServer ) => {
         const messages = await MessageModel.find({});
         socketClient.emit('update-messages', messages);
 
-        socketClient.on('new-message', async (msg) => {
+        socketClient.on('new-message', authMiddleware('jwt'), authRole(['user']), async (msg) => {
             await MessageModel.create(msg);
             const messages = await MessageModel.find({});
             io.emit('update-messages', messages);

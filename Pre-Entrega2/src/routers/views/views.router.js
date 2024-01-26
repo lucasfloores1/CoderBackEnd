@@ -9,7 +9,7 @@ const router = Router();
 /*//Instancia de ProductManager
 const pm = new ProductManager(path.join(__dirname,'./products.json'));*/
 
-router.get('/', authMiddleware('jwt'), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     if (!req.user) {
       return res.redirect('/login');

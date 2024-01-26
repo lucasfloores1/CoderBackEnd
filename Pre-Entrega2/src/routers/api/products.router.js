@@ -3,8 +3,7 @@ import { Router } from 'express';
 import ProductManager from '../ProductManager.js';*/
 import { emit } from '../../socket.js';
 import ProductsManager from '../../controllers/products.controller.js';
-import productModel from '../../dao/models/product.model.js';
-import { buildResponsePaginated, uploader, __dirname } from '../../utils.js';
+import { buildResponsePaginated, uploader, __dirname, authMiddleware, authRole } from '../../utils.js';
 
 
 const router = Router();
@@ -24,7 +23,8 @@ router.get( '/products', async (req, res) =>{
     if (search) {
         criteria.type = search;
     }
-    const result = await productModel.paginate(criteria, options);
+    //const result = await productModel.paginate(criteria, options);
+    const result = await ProductsManager.getPaginatedProducts(criteria, options);
     res.status(200).json(buildResponsePaginated({ ...result, sort, search }));
 });
 
@@ -38,7 +38,7 @@ router.get( '/products/:pid', async (req, res) =>{
     }
 });
 
-router.post( '/products', uploader.array('thumbnails') ,async (req, res) => {
+router.post( '/products', authMiddleware('jwt'), authRole(['admin']), uploader.array('thumbnails') ,async (req, res) => {
     const { body } = req
     const files = req.files
     const imgPath = '/img';
@@ -56,7 +56,7 @@ router.post( '/products', uploader.array('thumbnails') ,async (req, res) => {
     }
 });
 
-router.put( '/products/:pid', async (req, res) => {
+router.put( '/products/:pid', authMiddleware('jwt'), authRole(['admin']), async (req, res) => {
     const { pid } = req.params;
     const { body } = req;
     try {
@@ -67,7 +67,7 @@ router.put( '/products/:pid', async (req, res) => {
     }
 });
 
-router.delete( '/products/:pid', async (req, res) => {
+router.delete( '/products/:pid', authMiddleware('jwt'), authRole(['admin']), async (req, res) => {
     const { pid } = req.params;
     try {
         const deletedProduct = await ProductsManager.getById(pid);

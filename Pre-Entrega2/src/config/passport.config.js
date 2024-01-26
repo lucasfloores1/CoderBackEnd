@@ -2,10 +2,11 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GithubStrategy } from 'passport-github2';
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
-import userModel from '../dao/models/user.model.js';
 import { createHash } from '../utils.js';
 import CartsManager from '../controllers/carts.controller.js';
 import config from './config.js';
+import UsersService from '../services/users.service.js';
+import userModel from '../dao/models/user.model.js';
 
 
 export const init = () => {
@@ -34,19 +35,19 @@ export const init = () => {
         ){
             return done(new Error('All fields are required'))
         }
-        const user = await userModel.findOne({ email });
+        const user = await UsersService.getByEmail(email)
         if (user){
             return done(new Error('This email is already used'))
         }
         const cart = await CartsManager.create();
-        const newUser = await userModel.create({
+        const newUser = await UsersService.create({
             first_name,
             last_name,
             age,
             email,
-            cart : cart._id,
             password : createHash(password),
             role,
+            cart : cart._id
         })
         done(null, newUser);
     }));   
@@ -77,27 +78,21 @@ export const init = () => {
     }
     passport.use('github', new GithubStrategy(githubOpts, async (accesstoken, refreshToken, profile, done) => {
         const email = profile._json.email;
-        const user = await userModel.findOne({ email });
+        const user = await userModel.findOne({ email })
         if (user) {
             return done(null, user);
         }
+        const cart = await CartsManager.create();
         const githubUser = {
-            first_name : profile._json.name,
-            last_name : '',
+            first_name : profile._json.name.split(' ')[0],
+            last_name : profile._json.name.split(' ')[1],
             email,
-            password : '',
-            age : '00'
+            password : ' ',
+            age : '00',
+            cart : cart._id
         }
-        const newUser = await userModel.create(githubUser);
+        const newUser = await UsersService.create(githubUser);
         done(null, newUser);
     }));
 
-    /*passport.serializeUser((user, done) => {
-        done(null, user._id);
-    });
-
-    passport.deserializeUser(async (uid, done) => {
-        const user = await userModel.findById(uid);
-        done(null, user);
-    });*/
 };

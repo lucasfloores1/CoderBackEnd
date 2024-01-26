@@ -8,6 +8,7 @@ const ProductItemSchema = new mongoose.Schema({
 const CartSchema = new mongoose.Schema(
   {
     products: { type: [ProductItemSchema], default: [] },
+    total : { type: Number, required : false, default : 0 },
   },
   { timestamps: true }
 );

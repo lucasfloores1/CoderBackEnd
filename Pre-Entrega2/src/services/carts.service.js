@@ -1,24 +1,31 @@
-import CartDao from '../dao/cart.dao.js'
+import { cartsRepository } from "../repositories/index.js";
 
 export default class CartsService {
-    static getAll (filter = {}) {
-        return CartDao.getAll(filter);
+    static getAll( filter = {} ) {
+        return cartsRepository.getAll(filter);
     }
 
-    static create(data) {
-        return CartDao.create(data);
+    static getById( cid ) {
+        return cartsRepository.getById(cid);
     }
 
-    static async getById(cid) {
-        const result = await CartDao.getAll({ _id : cid });
-        return result[0];
+    static create() {
+        return cartsRepository.create();
     }
 
-    static updateById(cid, data) {
-        return CartDao.updateById(cid, data);
+    static addProductToCart(cid, pid) {
+        return cartsRepository.addProductToCart(cid, pid);
     }
 
-    static deleteById(cid) {
-        return CartDao.deleteById(cid);
+    static deleteProductFromCart( cid, pid ) {
+        return cartsRepository.deleteAllProductsFromCart(cid, pid);
+    }
+    
+    static deleteAllProductsFromCart( cid ) {
+        return cartsRepository.deleteAllProductsFromCart( cid );
+    }
+
+    static updateQuantityOfProduct( cid, pid, quantity ){
+        return cartsRepository.updateQuantityOfProdcut( cid, pid, quantity );
     }
 }

@@ -1,14 +1,15 @@
 import { Router } from "express";
 import { isValidPassword, generateToken, authMiddleware, createHash } from "../../utils.js";
 import passport from "passport";
-import userService from '../../services/users.service.js';
+import UsersService from "../../services/users.service.js";
+import UserDTO from "../../dto/user.dto.js";
 
 const router = Router();
 
 //Local Login
 router.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = await userService.getByEmail(email);
+    const user = await UsersService.getByEmail(email);
     if (!user) {
         return res.status(401).json({ message: 'Email or password are wrong' });
     }
@@ -55,19 +56,21 @@ router.post('/auth/restore-password', async (req,res) => {
     if ( !email || !password ){
         return res.render('../views/error.handlebars', { title : 'Error' })
     }
-    const user = await userService.getByEmail(email);
+    const user = await UsersService.getByEmail(email);
     if (!user){
         return res.render('../views/error.handlebars', { title : 'Error' })
     }
     user.password = createHash(password);
-    await userService.updateByEmail(email, user);
+    await UsersService.updateByEmail(email, user);
     res.redirect('/login')
 });
 
 //Current
 router.get('/auth/current', authMiddleware('jwt'), async (req, res) => {
     if (req.user) {
-        res.status(200).json({ user : req.user })
+      const user = new UserDTO( await UsersService.getByEmail(req.user.email) );
+      
+        res.status(200).json({ user : user })
     } else {
         res.status(500).send({ error : 'There was an error getting your user' })
     }
