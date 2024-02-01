@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import { __dirname } from './utils.js';
+import { __dirname } from './utils/utils.js';
 import handlebars from 'express-handlebars';
 import cookieParser from 'cookie-parser';
 /*import sessions from 'express-session';
@@ -11,7 +11,8 @@ import productsRoter from './routers/api/products.router.js';
 import cartsRouter from './routers/api/carts.router.js';
 import viewsRouter from './routers/views/views.router.js';
 import config from './config/config.js';
-import authRouter from './routers/api/auth.router.js'
+import authRouter from './routers/api/auth.router.js';
+import { errorHandlerMiddleware } from './middlewares/error-handler.middleware.js'
 
 const app = express();
 
@@ -42,10 +43,7 @@ app.use(passport.initialize());
 app.use('/api', productsRoter, cartsRouter, authRouter);
 app.use('/', viewsRouter);
 
-app.use((error, req, res, next) => {
-    const message = `There was an unexpected error : ${error.message}`;
-    console.error(message);
-    res.status(500).json({ message });
-});
+
+app.use(errorHandlerMiddleware);
 
 export default app;

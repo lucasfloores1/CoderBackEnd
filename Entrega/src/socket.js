@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 
 import MessageModel from './dao/models/message.model.js';
-import { authMiddleware, authRole } from './utils.js';
+import { authMiddleware, authRole } from './utils/utils.js';
 
 let io;
 

@@ -4,7 +4,8 @@ import url from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
-import config from './config/config.js';
+import config from '../config/config.js';
+import { faker } from '@faker-js/faker';
 import { v4 as uuidv4 } from 'uuid';
 
 export const URL_BASE = 'http://localhost:8080/api';
@@ -20,6 +21,32 @@ export const createTicketCode = uuidv4();
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
 export const isValidPassword = (password, user) => bcrypt.compareSync( password, user.password );
+
+//faker (MOCKING)
+
+const createRandomProduct = () => {
+    let images = [];
+    for (let index = 0; index < faker.number.int({ min: 1, max: 5 }); index++) {
+        const image = faker.image.url();
+        images.push(image);
+    }
+    return {
+        id : faker.database.mongodbObjectId(),
+        title : faker.commerce.productName(),
+        description : faker.lorem.paragraph(),
+        price : faker.commerce.price(),
+        code : faker.string.alphanumeric({ length: 10 }),
+        stock : faker.number.int({ min: 10, max: 70 }),
+        thumbnails : images,
+        type : faker.commerce.department()
+    }
+};
+
+export const generateProducts = (amount) => {
+    const Products = faker.helpers.multiple( createRandomProduct, { count : amount } );
+    console.log(Products);
+    return Products;
+};
 
 //jwt
 

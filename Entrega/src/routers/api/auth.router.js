@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware, createHash } from "../../utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash } from "../../utils/utils.js";
 import passport from "passport";
 import UsersService from "../../services/users.service.js";
 import UserDTO from "../../dto/user.dto.js";

@@ -2,7 +2,7 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GithubStrategy } from 'passport-github2';
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
-import { createHash } from '../utils.js';
+import { createHash } from '../utils/utils.js';
 import CartsManager from '../controllers/carts.controller.js';
 import config from './config.js';
 import UsersService from '../services/users.service.js';

@@ -6,7 +6,7 @@ import { __dirname } from '../utils.js';*/
 import CartsManager from '../../controllers/carts.controller.js';
 import ProductsManager from '../../controllers/products.controller.js';
 import TicketManager from '../../controllers/tickets.controller.js'
-import { authMiddleware, authRole } from '../../utils.js';
+import { authMiddleware, authRole } from '../../utils/utils.js';
 
 const router = Router();
 

@@ -1,9 +1,8 @@
 import { Router } from 'express';
 /*import ProductManager from '../ProductManager.js';*/
-import { __dirname, authMiddleware } from '../../utils.js';
 import ProductsManager from '../../controllers/products.controller.js';
 import productModel from '../../dao/models/product.model.js';
-import { buildResponsePaginated } from '../../utils.js';
+import { buildResponsePaginated, __dirname, authMiddleware } from '../../utils/utils.js';
 const router = Router();
 
 /*//Instancia de ProductManager

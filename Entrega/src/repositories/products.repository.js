@@ -1,7 +1,10 @@
 import path from 'path';
-import { __dirname } from '../utils.js';
+import { __dirname } from '../utils/utils.js';
 import fs from 'fs';
 import ProductDTO from '../dto/product.dto.js';
+import EnumsError from '../utils/EnumsError.js';
+import { CustomError } from '../utils/CustomError.js';
+import { generatorProductError } from '../utils/CauseMessageError.js';
 
 export default class ProductRepository {
 
@@ -10,7 +13,7 @@ export default class ProductRepository {
     }
 
     async getAll(filter = {}) {
-        const products = this.dao.getAll(filter);
+        const products = await this.dao.getAll(filter);
         return products.map( product => new ProductDTO(product) )
     }
 
@@ -22,12 +25,8 @@ export default class ProductRepository {
         return new ProductDTO(product);
     }
     async create(product) {
-        //Validate
-        if ( !product.code || !product.title || !product.description || !product.price || !product.stock || !product.type ){
-            throw new Error('All the fields are required');
-        }
         //Validate code
-        const products = await this.get();
+        const products = await this.getAll();
         let duplicatedProduct = products.find( prod => prod.code === product.code );
         if ( duplicatedProduct ){
             throw new Error('Product code already exist');
