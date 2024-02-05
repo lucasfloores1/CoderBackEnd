@@ -13,12 +13,14 @@ import viewsRouter from './routers/views/views.router.js';
 import config from './config/config.js';
 import authRouter from './routers/api/auth.router.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler.middleware.js'
+import { addLogger } from './config/logger.js';
 
 const app = express();
 
 //const SECRET_KEY = `a0A9U9qUkEwc`;
 
 app.use(cookieParser(config.cookie_secret));
+app.use(addLogger);
 /*app.use(sessions({
     store : MongoStorage.create({
         mongoUrl: URI,

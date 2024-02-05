@@ -97,4 +97,16 @@ router.get('/restore-password', async (req, res) =>{
   res.render('restore-pw', { title : 'Restore Password' });
 });
 
+//LoggerTest
+
+router.get('/loggerTest', (req, res) => {
+  req.logger.debug('Testing Logger Level (debug)');
+  req.logger.http('Testing Logger Level (http)');
+  req.logger.info('Testing Logger Level (info)');
+  req.logger.warning('Testing Logger Level (warning)');
+  req.logger.error('Testing Logger Level (error)');
+  req.logger.fatal('Testing Logger Level (fatal)');
+  res.send('Loggers Tested');
+});
+
 export default router;
