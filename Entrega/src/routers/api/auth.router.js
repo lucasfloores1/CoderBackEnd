@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware, createHash } from "../../utils/utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash, generateRestorePasswordToken, __dirname } from "../../utils/utils.js";
 import passport from "passport";
 import UsersService from "../../services/users.service.js";
 import UserDTO from "../../dto/user.dto.js";
+import EmailService from "../../services/email.service.js";
+import fs from 'fs';
+import handlebars from 'handlebars';
+import path from 'path';
 
 const router = Router();
 
@@ -50,20 +54,6 @@ router.get('/sessions/github/callback', passport.authenticate('github', { sessio
   }
 });
 
-//Restore password
-router.post('/auth/restore-password', async (req,res) => {
-    const { body : { email, password } } = req;
-    if ( !email || !password ){
-        return res.render('../views/error.handlebars', { title : 'Error' })
-    }
-    const user = await UsersService.getByEmail(email);
-    if (!user){
-        return res.render('../views/error.handlebars', { title : 'Error' })
-    }
-    user.password = createHash(password);
-    await UsersService.updateByEmail(email, user);
-    res.redirect('/login')
-});
 
 //Current
 router.get('/auth/current', authMiddleware('jwt'), async (req, res) => {
@@ -81,6 +71,65 @@ router.get('/auth/logout', (req, res) => {
   res.clearCookie('accessToken');
   req.user = null;
   res.redirect('/login');
+});
+
+//Restore Password
+router.post('/auth/restore-password/email', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await UsersService.getByEmail(email);
+    const token = generateRestorePasswordToken(user.email)
+    const emailService = EmailService.getInstance();
+    const source = fs.readFileSync(path.join(__dirname, '../views/restore-pw-email-template.handlebars'), 'utf8');
+    const template = handlebars.compile(source);
+    const html = template({ token })
+
+    const result = await emailService.sendEmail(user.email, 'Link to restore your password', html);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).send({ error : error.message })
+  }
+});
+
+router.post('/auth/restore-password', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await UsersService.getByEmail(email);
+    if (isValidPassword(password, user)) {
+      res.render('restore-pw', { email, repeated : true })
+    }
+    const newPassword = createHash(password);
+    await UsersService.updateByEmail(email, { password : newPassword });
+    res.render('login');
+  } catch (error) {
+    res.status(500).send({ error : 'There was an error while restoring your password' })
+  }
+});
+
+//Premium User
+router.get('/auth/users/premium/:uid', async (req,res) => {
+  const { uid } = req.params;
+  try {
+    const user = await UsersService.getById(uid);
+    switch (user.role) {
+      case 'admin':
+        throw new Error('admin cant get premium role');
+      case 'user':
+        await UsersService.updateById( uid, { role : 'premium' } );
+        const newPremiumUser = await UsersService.getById(uid);
+        res.send(newPremiumUser);
+        break;
+      case 'premium':
+        await UsersService.updateById( uid, { role : 'user' } );
+        const newUser = await UsersService.getById(uid);
+        res.send(newUser);
+        break;
+      default:
+        throw new Error('something was wrong');
+    }
+  } catch (error) {
+    res.status(500).send({ error : error.message })
+  }
 });
 
 export default router;

@@ -1,7 +1,9 @@
 import CartDTO from "../dto/cart.dto.js";
-import { usersRepository } from "./index.js";
+import { productsRepository, usersRepository } from "./index.js";
 import EnumsError from '../utils/EnumsError.js';
 import { CustomError } from '../utils/CustomError.js';
+import UsersService from "../services/users.service.js";
+import UserDTO from "../dto/user.dto.js";
 
 export default class CartRepository {
     constructor(dao) {
@@ -30,8 +32,14 @@ export default class CartRepository {
         return cart;
     }
 
-    async addProductToCart(cid, pid) {
+    async addProductToCart(cid, pid, uid) {
         try {
+            console.log('parametros metodo', cid,pid,uid);
+            const user = await UsersService.getById(uid);
+            const product = await productsRepository.getById(pid);
+            if (user._id = product.owner.id) {
+                throw new Error('You cant add a product that you created')
+            }
             const cart = await this.dao.getById(cid);
             const existingProduct = cart.products.find((product) => product.product._id.toString() === pid );  
             if (!existingProduct) {
@@ -86,8 +94,13 @@ export default class CartRepository {
         }
     }
 
-    async updateQuantityOfProdcut ( cid, pid, quantity ){
+    async updateQuantityOfProdcut ( cid, pid, quantity, uid ){
         try {
+            const user = await usersRepository.getById(uid);
+            const product = await productsRepository.getById(pid);
+            if (user.id === product.owner) {
+                throw new Error('You cant add a product that you created')
+            }
             const cart = await this.dao.getById(cid);
             const existingProduct = cart.products.find((product) => product._id === pid);
     

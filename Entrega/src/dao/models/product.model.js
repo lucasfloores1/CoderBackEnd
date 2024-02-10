@@ -8,8 +8,13 @@ const ProductSchema = new mongoose.Schema({
     code: { type: String, required: true },
     stock: { type: Number, required: true },
     thumbnails: { type: Array, required: true },
-    type: { type: Array, required: true }
+    type: { type: Array, required: true },
+    owner : { type : mongoose.Schema.Types.ObjectId, ref : 'User', default : null }
 },{ timestamps : true });
+
+ProductSchema.pre('findOne', function (){
+    this.populate('owner')
+});
 
 ProductSchema.plugin(mongoosePaginate);
 

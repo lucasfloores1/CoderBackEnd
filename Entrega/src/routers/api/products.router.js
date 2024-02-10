@@ -7,6 +7,7 @@ import { buildResponsePaginated, uploader, __dirname, authMiddleware, authRole, 
 import EnumsError from '../../utils/EnumsError.js';
 import { CustomError } from '../../utils/CustomError.js';
 import { generatorProductError ,productIdError } from '../../utils/CauseMessageError.js';
+import UsersService from '../../services/users.service.js';
 
 
 const router = Router();
@@ -49,7 +50,7 @@ router.get( '/products/:pid', async (req, res) =>{
     }
 });
 
-router.post( '/products', authMiddleware('jwt'), authRole(['admin']), uploader.array('thumbnails') ,async (req, res, next) => {
+router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']), uploader.array('thumbnails') ,async (req, res, next) => {
     try {
         const { body } = req
         const { 
@@ -59,6 +60,7 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin']), uploader.a
             price,
             stock,
             type,
+            owner
          } = body
          if (
             !code ||
@@ -77,6 +79,7 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin']), uploader.a
                     price,
                     stock,
                     type,
+                    owner
                 }),
                 message: 'There was an error while creating the product',
                 code: EnumsError.BAD_REQUEST_ERROR,
@@ -104,7 +107,7 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin']), uploader.a
     }
 });
 
-router.put( '/products/:pid', authMiddleware('jwt'), authRole(['admin']), async (req, res) => {
+router.put( '/products/:pid', authMiddleware('jwt'), authRole(['admin', 'premium']), async (req, res) => {
     const { pid } = req.params;
     const { body } = req;
     try {
@@ -115,9 +118,20 @@ router.put( '/products/:pid', authMiddleware('jwt'), authRole(['admin']), async 
     }
 });
 
-router.delete( '/products/:pid', authMiddleware('jwt'), authRole(['admin']), async (req, res) => {
+/*router.delete( '/products/:pid/user/:uid', authMiddleware('jwt'), authRole(['admin', 'premium']), async (req, res) => {
     const { pid } = req.params;
+    const { uid } = req.params;
     try {
+        const user = await UsersService.getById(uid);
+        if (user.role === 'premium') {
+            const deletedProduct = await ProductsManager.getById(pid);
+            if (user._id = deletedProduct.owner.id) {
+                await ProductsManager.deleteById(deletedProduct.id);
+                emit('productDeleted', deletedProduct.code);
+                res.send(deletedProduct)
+            }
+            throw new Error('You cant delete a product that you did not create')
+        }
         const deletedProduct = await ProductsManager.getById(pid);
         await ProductsManager.deleteById(pid);
         emit('productDeleted', deletedProduct.code);
@@ -125,9 +139,29 @@ router.delete( '/products/:pid', authMiddleware('jwt'), authRole(['admin']), asy
     } catch (error) {
         res.status(500).send({error : error.message});
     }
+});*/
+router.delete('/products/:pid/user/:uid', authMiddleware('jwt'), authRole(['admin', 'premium']), async (req, res) => {
+    const { pid, uid } = req.params;
+    try {
+        const user = await UsersService.getById(uid);
+        const deletedProduct = await ProductsManager.getById(pid);       
+        if (!deletedProduct) {
+            throw new Error('Product not found');
+        }
+        if (user.role === 'premium') {
+            if ( user._id.toString() !== deletedProduct.owner.id.toString() ) {
+                throw new Error('You cannot delete a product that you did not create');
+            }
+        }
+        await ProductsManager.deleteById(pid);
+        emit('productDeleted', deletedProduct.code);
+        res.send(deletedProduct);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
 });
 
-router.get( '/mockingproducts', authMiddleware('jwt'), authRole(['admin']), async (req, res) => {
+router.get( '/mockingproducts', authMiddleware('jwt'), authRole(['admin', 'premium']), async (req, res) => {
     try {
         const products = await generateProducts(50);
         res.send(products);

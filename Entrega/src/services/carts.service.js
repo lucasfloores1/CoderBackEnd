@@ -13,8 +13,8 @@ export default class CartsService {
         return cartsRepository.create();
     }
 
-    static addProductToCart(cid, pid) {
-        return cartsRepository.addProductToCart(cid, pid);
+    static addProductToCart(cid, pid, uid) {
+        return cartsRepository.addProductToCart(cid, pid, uid);
     }
 
     static deleteProductFromCart( cid, pid ) {

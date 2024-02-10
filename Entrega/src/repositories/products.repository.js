@@ -45,16 +45,17 @@ export default class ProductRepository {
     async deleteById(pid) {
         try {
             const deletedProduct = await this.dao.getById(pid);
+            const defaultImgPath = '/img/default-product.jpg';
             //Delete IMGS from PUBLIC
-            deletedProduct.thumbnails.forEach((thumbnail) => {
-                const filePath = path.join(__dirname, `../public/${thumbnail}`);
-                fs.unlinkSync(filePath);
-            });
-            //await ProductModel.deleteOne({ _id: pid });
-            console.log(`Product Deleted succesfully (${pid}) .`);
+            if (!deletedProduct.thumbnails.includes(defaultImgPath)) {
+                deletedProduct.thumbnails.forEach((thumbnail) => {
+                    const filePath = path.join(__dirname, `../../public/${thumbnail}`);
+                    fs.unlinkSync(filePath);
+                });
+            }
             await this.dao.deleteById(pid);
         } catch (error) {
-            throw new Error('There was an error while deleting the products');
+            throw new Error(error.message);
         }
     }
 

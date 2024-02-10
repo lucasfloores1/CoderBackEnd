@@ -1,0 +1,20 @@
+<article class="card text-bg-secondary mb-3">
+  <form class="card-body" action="/api/auth/restore-password/email" method="post">
+    <header class="card-title">
+      <h1 class="h3 mb-3 font-weight-normal">Restore your password</h1>
+    </header>
+    {{#if expired}}
+      <div class="alert alert-danger" role="alert">
+        The link of the email is expired, you can generate a new one by typing your email down below
+      </div>
+    {{/if}}
+    <div class="form-group">
+      <label for="inputEmail" style="margin-bottom: 5px">Email</label>
+      <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Correo" required autofocus>
+    </div>
+
+    <div class="form-group" style="margin-top: 15px">
+      <button class="btn btn-primary btn-block" type="submit">Send email</button>
+    </div>
+  </form>
+</article>

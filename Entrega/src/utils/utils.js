@@ -50,6 +50,11 @@ export const generateProducts = (amount) => {
 
 //jwt
 
+export const generateRestorePasswordToken = (email) => {
+    const token = jwt.sign( {email}, config.jwt_secret, { expiresIn : '1h' } );
+    return token;
+};
+
 export const generateToken = (user) => {
     const payload = {
         id : user._id,
@@ -63,10 +68,10 @@ export const generateToken = (user) => {
 };
 
 export const verifyToken = (token) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         jwt.verify(token, config.jwt_secret, (error, payload) => {
             if (error) {
-                return resolve(false);
+                reject(error);
             }
             resolve(payload);
         });

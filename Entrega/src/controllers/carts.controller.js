@@ -16,8 +16,8 @@ export default class CartsManager {
         return cart;
     }
 
-    static async addProductToCart(cid, pid) {
-        const updatedCart = await CartsService.addProductToCart(cid, pid);
+    static async addProductToCart(cid, pid, uid) {
+        const updatedCart = await CartsService.addProductToCart(cid, pid, uid);
         return updatedCart;
     }
 

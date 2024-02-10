@@ -2,7 +2,8 @@ import { Router } from 'express';
 /*import ProductManager from '../ProductManager.js';*/
 import ProductsManager from '../../controllers/products.controller.js';
 import productModel from '../../dao/models/product.model.js';
-import { buildResponsePaginated, __dirname, authMiddleware } from '../../utils/utils.js';
+import { buildResponsePaginated, __dirname, authMiddleware, verifyToken } from '../../utils/utils.js';
+
 const router = Router();
 
 /*//Instancia de ProductManager
@@ -93,8 +94,19 @@ router.get('/register', async (req, res) =>{
   res.render('register', { title : 'Register' });
 });
 
-router.get('/restore-password', async (req, res) =>{
-  res.render('restore-pw', { title : 'Restore Password' });
+router.get('/restore-password-email', async (req, res) =>{
+  res.render('restore-pw-email', {title : 'Restore Password'})
+});
+
+router.get('/restore-password', async (req, res) => {
+  const { token } = req.query;
+  try {
+    const payload = await verifyToken(token);
+    const email = payload.email;
+    res.render('restore-pw', { title : 'Restore Password', email , repeated : false })
+  } catch (error) {
+    res.render('restore-pw-email', {title : 'Restore Password', expired : true})
+  }
 });
 
 //LoggerTest
