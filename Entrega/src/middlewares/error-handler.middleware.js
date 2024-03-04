@@ -1,21 +1,27 @@
 import EnumsError from "../utils/EnumsError.js";
+import { logger } from "../config/logger.js";
 
 export const errorHandlerMiddleware = (error, req, res, next) => {
-  console.error(error.cause || error.message);
+  //console.error(error.cause || error.message);
   switch (error.code) {
     case EnumsError.BAD_REQUEST_ERROR:
-      res.status(400).json({ status: 'error', message: 'request error' });
+      req.logger.error(`${error.cause}`);
+      res.status(400).json({ status: 'error', cause : error.cause });
       break;
     case EnumsError.INVALID_PARAMS_ERROR:
-      res.status(400).json({ status: 'error', message: 'invalid params error' });
+      req.logger.error(`${error.cause}`);
+      res.status(400).json({ status: 'error', cause: error.cause });
       break;
     case EnumsError.DATA_BASE_ERROR:
-      res.status(400).json({ status: 'error', message: 'database error' });
+      req.logger.error(`${error.cause}`);
+      res.status(400).json({ status: 'error', cause: error.cause });
       break;
     case EnumsError.ROUTING_ERROR:
-      res.status(400).json({ status: 'error', message: 'routing error' });
+      req.logger.error(`${error.cause}`);
+      res.status(400).json({ status: 'error', cause: error.cause });
       break;
     default:
-      res.status(500).json({ status: 'error', message: error.message });
+      req.logger.error(`${error.cause}`);
+      res.status(500).json({ status: 'error', cause: error.cause });
   }
 }

@@ -18,7 +18,7 @@ export default class CartsService {
     }
 
     static deleteProductFromCart( cid, pid ) {
-        return cartsRepository.deleteAllProductsFromCart(cid, pid);
+        return cartsRepository.deleteProductFromCart(cid, pid);
     }
     
     static deleteAllProductsFromCart( cid ) {

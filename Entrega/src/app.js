@@ -5,6 +5,10 @@ import handlebars from 'express-handlebars';
 import cookieParser from 'cookie-parser';
 /*import sessions from 'express-session';
 import MongoStorage from 'connect-mongo'*/
+import swaggerUi from 'swagger-ui-express';
+import swaggerJSDoc from 'swagger-jsdoc';
+import { logger } from './config/logger.js';
+
 import passport from 'passport';
 import { init as passportInit } from './config/passport.config.js';
 import productsRoter from './routers/api/products.router.js';
@@ -21,6 +25,8 @@ const app = express();
 
 app.use(cookieParser(config.cookie_secret));
 app.use(addLogger);
+
+//sessions deprecated
 /*app.use(sessions({
     store : MongoStorage.create({
         mongoUrl: URI,
@@ -31,6 +37,23 @@ app.use(addLogger);
     resave : true,
     saveUninitialized : true,
 }));*/
+
+//docs
+if (config.env !== 'prod') {
+    const swaggerOpts = {
+      definition: {
+        openapi: '3.0.0',
+        info: {
+          title: 'E-commerce API',
+          description: 'This is the documentation of an E-commerce API',
+        },
+      },
+      apis: [path.join(__dirname, '..', 'docs', '**', '*.yaml')],
+    };
+    const specs = swaggerJSDoc(swaggerOpts);
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+}
+  
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));

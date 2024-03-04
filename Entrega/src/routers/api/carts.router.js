@@ -17,14 +17,15 @@ const router = Router();
 const cm = new CartManager(path.join(__dirname,'./carts.json'));
 const pm = new ProductManager(path.join(__dirname,'./products.json'));*/
 
-router.post( '/carts', async (req, res) => {
+//deprecated because every user owns a cart
+/*router.post( '/carts', async (req, res) => {
     try {
         const newCart = await CartsManager.create();
-        res.send(newCart);
+        res.status(200).send(newCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }
-});
+});*/
 
 router.get( '/carts/:cid',  authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params
@@ -79,11 +80,11 @@ router.delete( '/carts/:cid', authMiddleware('jwt'), async (req, res) => {
     }    
 });
 
-router.put( '/carts/:cid/products/:pid', authMiddleware('jwt'), async (req, res) => {
+router.put( '/carts/:cid/products/:pid/user/:uid', authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params;
     const { pid } = req.params;
     const { quantity } = req.body;
-    const { uid } = req.query;
+    const { uid } = req.params;
     //validate and delete
     try {
         const product = await ProductsManager.getById(pid);

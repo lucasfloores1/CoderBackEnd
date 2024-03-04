@@ -37,7 +37,7 @@ export default class CartRepository {
             console.log('parametros metodo', cid,pid,uid);
             const user = await UsersService.getById(uid);
             const product = await productsRepository.getById(pid);
-            if (user._id = product.owner.id) {
+            if (user._id === product.owner.id) {
                 throw new Error('You cant add a product that you created')
             }
             const cart = await this.dao.getById(cid);
@@ -64,7 +64,8 @@ export default class CartRepository {
     async deleteProductFromCart( cid, pid ){
         try {
             const cart = await this.dao.getById(cid);
-            const existingProductIndex = cart.products.findIndex((product) => product._id === pid);
+            console.log(cart);
+            const existingProductIndex = cart.products.findIndex((product) => product.product._id.toString() === pid.toString() );
 
             if (existingProductIndex === -1) {
                 throw new Error('Product does not exist in this cart');
@@ -74,7 +75,7 @@ export default class CartRepository {
             await cart.save();
             return new CartDTO(cart);
         } catch (error) {
-            throw new Error('There was an error while deleting the product');
+            throw new Error(error.message);
         }
     }
 

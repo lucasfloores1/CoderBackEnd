@@ -1,0 +1,326 @@
+paths:
+  /api/products:
+    get:
+      summary: Gets a list of paginated products.
+      tags:
+        - Products
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          description: Limit of products per page.
+          schema:
+            type: number
+        - in: query
+          name: page
+          required: false
+          description: Index of pages.
+          schema:
+            type: number
+        - in: query
+          name: sort
+          required: false
+          description: Only correct values are "asc" "desc". this parameter will set if the products will be ordered by price in an ascendant or descendant way.
+          schema:
+            type: string
+        - in: query
+          name: search
+          required: false
+          description: types of the products, this parameter will filter products that has at least one of the values in the property "type".
+          schema:
+            type: string
+      responses:
+        200:
+          description: All the products were found in the data base.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Response status
+                    example: success
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaginatedProduct'
+        401:
+          description: Unahutorized.
+        404:
+          description: Parameters Error.
+        500:
+          description: Internal server error.
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - code
+                - title
+                - description
+                - price
+                - stock
+                - type
+              properties:
+                code:
+                  type: string
+                  description: Unique code of the product.
+                title:
+                  type: string
+                  description: Title of the product.
+                description:
+                  type: string
+                  description: Description of the product.
+                price:
+                  type: number
+                  description: Price of the product.
+                stock:
+                  type: integer
+                  description: Stock quantity of the product.
+                type:
+                  type: string
+                  description: Type or category of the product.
+                owner:
+                  type: string
+                  description: Owner of the product.
+                thumbnails:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Images of the product.
+      responses:
+        '200':
+          description: Product created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Invalid parameters.
+        '500':
+          description: Internal server error.
+  /api/products/{pid}:
+    get:
+      summary: Gets an specific product.
+      tags:
+        - Products
+      parameters:
+          - in: path
+            name: pid
+            required: true
+            description: Product Id to search
+            schema:
+              type: string
+      responses:
+        200:
+          description: The product got succesfully found and returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        401:
+          description: Unauthorized.
+        404:
+          description: Product not found.
+        500:
+          description: Server internal error.
+    put:
+      summary: Update a specific product
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: Product ID to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Product updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Product not found.
+        '500':
+          description: Internal server error.
+  /api/products/{pid}/user/{uid}:
+    delete:
+      summary: Delete a product owned by a user
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: pid
+          required: true
+          description: Product ID to delete
+          schema:
+            type: string
+        - in: path
+          name: uid
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized.
+        '404':
+          description: Product not found.
+        '500':
+          description: Internal server error. 
+components:
+  schemas:
+    PaginatedProduct:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Product's Id generated by the data base.
+        title:
+          type: string
+          description: Product's title.
+        description:
+          type: string
+          description: Product's description.
+        price:
+          type: number
+          description: Product's price.
+        code:
+          type: string
+          description: Product's unique code.
+        stock:
+          type: number
+          description: Product's stock.
+        thumbnails:
+          type: array
+          description: Paths to Product's images (if not images were given when created the app assigns a default img path).
+        type:
+          type: array
+          description: Product's types.
+        owner:
+          type: string
+          description: Product's owner Id. (if was created by an admin this field's value will be 'admin').
+        createdAt:
+          type: date
+          description: Product's creating date.
+        updatedAt:
+          type: date
+          description: Product's last time was updated at.
+        __v:
+          type: number
+          description: Product's version in the database.
+      example:
+        id: 65bc0d887e23e242160d0e68
+        title: Awesome Concrete Towels
+        description: Adeptio venio canis viduo alias vulticulus uredo unde unde magnam. Armarium creo cruciamentum adeptio claro thalassinus rerum decretum terreo tenus. Stella vere artificiose virgo usitas denuo ipsam claustrum soleo adipisci.
+        price: 565
+        code: hKddimGpZJ
+        stock: 66
+        thumbnails: [{/img/default-product.jpg}]
+        type: [{Music}]
+        owner: admin
+        createdAt: 2023-11-20T21:56:33.064Z
+        updatedAt: 2024-01-26T20:03:56.612Z
+        __v: 0
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Product's Id generated by the data base.
+        title:
+          type: string
+          description: Product's title.
+        description:
+          type: string
+          description: Product's description.
+        price:
+          type: number
+          description: Product's price.
+        code:
+          type: string
+          description: Product's unique code.
+        stock:
+          type: number
+          description: Product's stock.
+        thumbnails:
+          type: array
+          description: Paths to Product's images (if not images were given when created the app assigns a default img path).
+        type:
+          type: array
+          description: Product's types.
+        owner:
+          type: array
+          description: Product's owner Id. (if was created by an admin this field's value will be 'admin').
+      example:
+        id: 65bc0d887e23e242160d0e68
+        title: Awesome Concrete Towels
+        description: Adeptio venio canis viduo alias vulticulus uredo unde unde magnam. Armarium creo cruciamentum adeptio claro thalassinus rerum decretum terreo tenus. Stella vere artificiose virgo usitas denuo ipsam claustrum soleo adipisci.
+        price: 565
+        code: hKddimGpZJ
+        stock: 66
+        thumbnails: [{/img/default-product.jpg}]
+        type: [{Music}]
+        owner: admin 
+    ProductUpdate:
+      type: object
+      description: Product data to update.
+      properties:
+        id:
+          type: string
+          description: Product ID.
+        title:
+          type: string
+          description: Product title.
+        description:
+          type: string
+          description: Product description.
+        price:
+          type: number
+          description: Product price.
+        code:
+          type: string
+          description: Product code.
+        stock:
+          type: integer
+          description: Product stock.
+        thumbnails:
+          type: array
+          items:
+            type: string
+          description: Product thumbnails.
+        type:
+          type: array
+          items:
+            type: string
+          description: Product types.
+        owner:
+          type: string
+          description: Product owner.

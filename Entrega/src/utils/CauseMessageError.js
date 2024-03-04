@@ -1,13 +1,13 @@
 export const generatorProductError = (data) => {
   return `All the fields are required.
-    List of parameters recieved in the request:
-    - title  : ${data.title}
-    - description   : ${data.description}
-    - price       : ${data.price}
-    - stock         : ${data.stock}
-    - code         : ${data.code}
-    - type         : ${data.type}
-    `;
+  List of parameters recieved in the request:
+  - title  : ${data.title}
+  - description   : ${data.description}
+  - price       : ${data.price}
+  - stock         : ${data.stock}
+  - code         : ${data.code}
+  - type         : ${data.type}
+  `;
 };
 
 export const productIdError = (id) => {
