@@ -1,0 +1,43 @@
+<div class="container">
+    <h1 class="mt-4 mb-4">Shopping Cart</h1>
+
+    <article>
+        <div class="d-flex justify-content-end">
+            <a href="/api/auth/logout" class="ml-2">Log out</a>
+            <a href="/products" class="ml-2"> Back to Products</a>
+        </div>
+        <h2>{{user.name}}'s Cart</h2>
+    </article>
+
+    {{#if cart.products.length}}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {{#each cart.products}}
+        <div class="col">
+            <div class="card">
+                <img src="{{this.product.thumbnails.[0]}}" class="card-img-top" alt="{{this.product.title}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{this.product.title}}</h5>
+                    <h5 class="card-subtitle"> Units: {{this.quantity}}</h5>
+                    <p class="card-text">Price: ${{multiply this.product.price this.quantity}}</p>
+                    <button class="btn btn-danger delete-product" data-cart-id="{{../cart.id}}" data-product-id="{{this.product.id}}">Delete</button>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <p>There are no products in the cart.</p>
+    {{/if}}
+
+    <hr>
+
+    <div class="row">
+        <div class="col">
+            <h4>Total:</h4>
+            <p>${{cart.total}}</p>
+            <button class="btn btn-danger delete-cart" data-cart-id="{{cart.id}}">Delete Cart</button>
+            <button class="btn btn-primary purchase-cart" data-cart-id="{{cart.id}}">Buy</button>
+        </div>
+    </div>
+</div>
+<script src="/js/cart.js"></script>

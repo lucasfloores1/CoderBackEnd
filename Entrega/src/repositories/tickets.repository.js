@@ -25,8 +25,6 @@ export default class TicketRepository {
         // Get Cart and User
         const cart = await cartsRepository.getById(cid);
         const user = await usersRepository.getByEmail(email);
-        console.log(user);
-        console.log('carro', cart);
         // Validate Stocks
         let data = {
             amount : 0,
@@ -34,9 +32,7 @@ export default class TicketRepository {
             code : createTicketCode,
         }
         await Promise.all(cart.products.map(async (product) => {
-            const DBproduct = await productsRepository.getById(product.product.id)
-            console.log('dentro del map', DBproduct, product.product);
-    
+            const DBproduct = await productsRepository.getById(product.product.id)    
             if (DBproduct.stock >= product.quantity) {
                 const updatedStock = DBproduct.stock - product.quantity
                 await productsRepository.updateById(product.product.id, { stock : updatedStock })
@@ -46,8 +42,9 @@ export default class TicketRepository {
             }
             // Proceso de compra
         }));
-    
-        const ticket = await this.dao.create(data);
+        const newTicket = await this.dao.create(data);
+        const ticket = await this.dao.getById(newTicket._id);
+        console.log(ticket);
         return new TicketDTO(ticket);
     }
 

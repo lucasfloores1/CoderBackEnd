@@ -32,13 +32,11 @@ export default class ProductRepository {
             throw new Error('Product code already exist');
         }       
         const newProduct = await this.dao.create(product);
-        console.log(`Product created succesfully (${newProduct._id}) .`);
         return new ProductDTO(newProduct);
     }
 
     async updateById(pid, data) {
         const updatedProduct = await this.dao.updateById(pid, data);
-        console.log(`Product updated succesfully (${pid}) .`);
         return new ProductDTO(updatedProduct);
     }
 

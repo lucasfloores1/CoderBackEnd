@@ -1,12 +1,17 @@
 <div class="container">
     <h1 class="mt-4 mb-4">Product List</h1>
     <article>
-        <h2>Welcome User {{user.name}}</h2>
-        <a href="/api/auth/logout" >Log Out</a>
+        <div class="d-flex justify-content-end">
+            <a href="/cart/{{user.cart_id}}" class="btn btn-primary">
+                <i class="fas fa-cart"></i> Cart <span class="badge bg-secondary">{{user.cart_products}}</span>
+            </a>
+            <a href="/api/auth/logout" class="ml-2">Log Out</a>
+        </div>
+        <h2 id="user-title" user-id="{{user.id}}">Welcome User {{user.name}}</h2>
     </article>
     <div class="row row-cols-1 row-cols-md-3 g-4" id="productsContainer" style="margin-top: 10px">
         {{#each payload}}
-        <div class="col" id="{{this.code}}">
+        <div class="col" id="{{this._id}}">
             <div class="card text-bg-secondary">
                 <div id="productCarousel{{@index}}" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
@@ -35,7 +40,7 @@
                     <h5 class="card-title">{{this.title}}</h5>
                     <p class="card-text" class="price">$ {{this.price}}</p>
                     <p class="card-text">{{this.description}}</p>
-                    <a href="#" class="btn btn-primary">Add to cart</a>
+                    <a href="#" class="btn btn-primary add-to-cart" product-id="{{this._id}}" >Add to cart</a>
                 </div>
             </div>
         </div>
@@ -61,3 +66,4 @@
       </div>
     {{/if}}
 </div>
+<script src="/js/products.js"></script>

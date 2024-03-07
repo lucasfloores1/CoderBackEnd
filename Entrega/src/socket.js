@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 
 import MessageModel from './dao/models/message.model.js';
 import { authMiddleware, authRole } from './utils/utils.js';
+import { logger } from './config/logger.js';
 
 let io;
 
@@ -9,7 +10,7 @@ export const init = ( httpServer ) => {
     io = new Server( httpServer );
 
     io.on('connection', async ( socketClient ) => {
-        console.log(`New socket client connected ${socketClient.id}`);
+        logger.info(`New socket client connected ${socketClient.id}`);
         const messages = await MessageModel.find({});
         socketClient.emit('update-messages', messages);
 

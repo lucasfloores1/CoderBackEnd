@@ -1,8 +1,12 @@
 import { Router } from 'express';
 /*import ProductManager from '../ProductManager.js';*/
 import ProductsManager from '../../controllers/products.controller.js';
+import CartsManager from '../../controllers/carts.controller.js'
 import productModel from '../../dao/models/product.model.js';
 import { buildResponsePaginated, __dirname, authMiddleware, verifyToken } from '../../utils/utils.js';
+import { logger } from '../../config/logger.js';
+import UsersService from '../../services/users.service.js';
+import TicketManager from '../../controllers/tickets.controller.js';
 
 const router = Router();
 
@@ -39,13 +43,14 @@ router.get('/products', authMiddleware('jwt'), async (req, res) => {
     const { limit = 10, page = 1, sort, search } = req.query;
     //validate login
     if (!req.user) {
+      logger.debug(`User is not defined ${req.user}, redirecting`)
       return res.redirect('/login');
     }
+    const requser = await UsersService.getByEmail(req.user.email);
     const user = {
       ...req.user,
-      isAdmin : req.user.role === 'admin'
+      cart_products: requser.cart.products.length,
     }
-    console.log(user);
     // sort esta asociado al campo price. Ademas los posibles valores son asc y desc
     // search esta asociado al campo type
     const criteria = {};
@@ -56,14 +61,14 @@ router.get('/products', authMiddleware('jwt'), async (req, res) => {
     if (search) {
         criteria.type = search;
     }
-    const result = await productModel.paginate(criteria, options);
+    const result = await ProductsManager.getPaginatedProducts(criteria, options);
     const baseUrl = 'http://localhost:8080';
     const data = buildResponsePaginated({ ...result, sort, search }, baseUrl);
     //render
-    if ( req.user.role === 'admin' ){
+    if ( req.user.isAdmin ){
       return res.render('productsAdmin', {title: 'Admin Products Table', ...data, user})
     }
-     return res.render('products', { title: 'Products List', ...data , user });
+    return res.render('products', { title: 'Products List', ...data , user });
   } catch (error) {
     return res.render('error', { title : 'Error Page', errorMessage: error.message })
   }
@@ -77,6 +82,21 @@ router.get('/realtimeproducts', async (req, res) => {
       products: products.map(product => ({ ...product.toObject() })),
     };
     res.render('realtimeproducts', templateData);
+  } catch (error) {
+    res.render('error', { title : 'Error Page', errorMessage: error.message })
+  }
+});
+
+router.get('/cart/:cid', authMiddleware('jwt'), async (req, res) => {
+  try {
+    const { cid } = req.params;
+    const cart = await CartsManager.getById(cid);
+    const templateData = {
+      title: 'Cart',
+      cart: cart,
+      user: req.user
+    };
+    res.render('cart', templateData);
   } catch (error) {
     res.render('error', { title : 'Error Page', errorMessage: error.message })
   }
@@ -107,6 +127,17 @@ router.get('/restore-password', async (req, res) => {
   } catch (error) {
     res.render('restore-pw-email', {title : 'Restore Password', expired : true})
   }
+});
+
+router.get('/purchase-confirmation', authMiddleware('jwt'), async (req, res) =>{
+  const { ticketId } = req.query;
+  const ticket = await TicketManager.getById(ticketId);
+  const templateData = {
+    title: 'Purchase Confirmation',
+    ticket : ticket
+  }
+  console.log(templateData);
+  res.render('purchase-confirmation', templateData);
 });
 
 //LoggerTest

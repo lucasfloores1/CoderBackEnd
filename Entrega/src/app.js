@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { __dirname } from './utils/utils.js';
-import handlebars from 'express-handlebars';
+import handlebars, { create as hbscreate } from 'express-handlebars';
 import cookieParser from 'cookie-parser';
 /*import sessions from 'express-session';
 import MongoStorage from 'connect-mongo'*/
@@ -56,9 +56,16 @@ if (config.env !== 'prod') {
   
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../public')));
+//app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static('public'));
 
-app.engine('handlebars', handlebars.engine());
+//handlebars
+const hbs = hbscreate({
+  helpers: {
+    multiply( a, b ) { return a * b; }
+  }
+})
+app.engine('handlebars', hbs.engine);
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'handlebars');
 

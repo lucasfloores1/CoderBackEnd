@@ -7,6 +7,7 @@ import EmailService from "../../services/email.service.js";
 import fs from 'fs';
 import handlebars from 'handlebars';
 import path from 'path';
+import { logger } from "../../config/logger.js";
 
 const router = Router();
 
@@ -26,6 +27,9 @@ router.post('/auth/login', async (req, res) => {
         maxAge: 12 * 60 * 60 * 1000,//12 hours
         httpOnly: true,
     });
+    /*const payload = await verifyToken(token);
+    req.user = payload;*/
+    logger.debug(`User ${user.email} logged in`);
     return res.redirect('/products');
 });
 
@@ -117,11 +121,13 @@ router.get('/auth/users/premium/:uid', async (req,res) => {
       case 'user':
         await UsersService.updateById( uid, { role : 'premium' } );
         const newPremiumUser = await UsersService.getById(uid);
+        logger.debug(`User ${newPremiumUser.email} got upgraded to premium user`);
         res.send(newPremiumUser);
         break;
       case 'premium':
         await UsersService.updateById( uid, { role : 'user' } );
         const newUser = await UsersService.getById(uid);
+        logger.debug(`User ${newPremiumUser.email} got downgraded to regular user`);
         res.send(newUser);
         break;
       default:

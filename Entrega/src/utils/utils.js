@@ -61,7 +61,9 @@ export const generateToken = (user) => {
         username : user.username,
         email : user.email,
         role : user.role,
-        name : `${user.first_name} ${user.last_name}`
+        name : `${user.first_name} ${user.last_name}`,
+        cart_id : user.cart._id,
+        isAdmin : user.role === 'admin'
     }
     const token = jwt.sign( payload, config.jwt_secret, { expiresIn : '5h' } );
     return token;

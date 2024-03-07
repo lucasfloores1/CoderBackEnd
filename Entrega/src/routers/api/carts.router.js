@@ -8,7 +8,7 @@ import ProductsManager from '../../controllers/products.controller.js';
 import TicketManager from '../../controllers/tickets.controller.js'
 import { authMiddleware, authRole } from '../../utils/utils.js';
 import UsersService from '../../services/users.service.js';
-import UserDTO from '../../dto/user.dto.js';
+import { logger } from '../../config/logger.js';
 
 const router = Router();
 
@@ -26,7 +26,7 @@ const pm = new ProductManager(path.join(__dirname,'./products.json'));*/
         res.status(500).send({error : error.message});
     }
 });*/
-
+//get by id
 router.get( '/carts/:cid',  authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params
     try {
@@ -36,24 +36,23 @@ router.get( '/carts/:cid',  authMiddleware('jwt'), async (req, res) => {
         res.status(500).send({error : error.message});
     }
 });
-
+//add product
 router.post( '/carts/:uid/products/:pid', authMiddleware('jwt'), authRole(['user', 'premium']), async (req, res) => {
     const { uid } = req.params;
     const { pid } = req.params;
-    //Validate pid and cid
+    //Validate pid and uid
     try {
-        console.log('router params', req.params);
         const user = await UsersService.getById(uid);
-        console.log('router user', user);
         const product = await ProductsManager.getById(pid);
-        console.log('producto router', product);
         const updatedCart = await CartsManager.addProductToCart( user.cart._id, product.id, user._id );
-        res.send(updatedCart);
+        logger.debug(`User ${user.email} added the product ${product.title} to the cart ${updatedCart._id}`)
+        //res.send(updatedCart);
+        res.redirect('/products');
     } catch (error) {
         res.status(500).send({error : error.message});
     }
 });
-
+//delete one product
 router.delete( '/carts/:cid/products/:pid', authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params;
     const { pid } = req.params;
@@ -62,24 +61,26 @@ router.delete( '/carts/:cid/products/:pid', authMiddleware('jwt'), async (req, r
         const product = await ProductsManager.getById(pid);
         const cart = await CartsManager.getById(cid);
         const updatedCart = await CartsManager.deleteProductFromCart( cart.id, product.id );
+        logger.debug(`User ${req.user.email} deleted the product ${product.title} from the cart ${updatedCart._id}`)
         res.send(updatedCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }    
 });
-
+//delete all products
 router.delete( '/carts/:cid', authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params;
     //validate and delete
     try {
         const cart = await CartsManager.getById(cid);
         const updatedCart = await CartsManager.deleteAllProductsFromCart( cart.id );
+        logger.debug(`User ${req.user.email} deleted the products from the cart ${updatedCart.id}`)
         res.send(updatedCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }    
 });
-
+//edit quantity of product
 router.put( '/carts/:cid/products/:pid/user/:uid', authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params;
     const { pid } = req.params;
@@ -90,19 +91,22 @@ router.put( '/carts/:cid/products/:pid/user/:uid', authMiddleware('jwt'), async 
         const product = await ProductsManager.getById(pid);
         const cart = await CartsManager.getById(cid);
         const updatedCart = await CartsManager.updateQuantityOfProdcut( cart.id, product.id, quantity, uid );
+        logger.debug(`User ${req.user.email} added ${quantity} units of the product ${product.title} to the cart ${updatedCart._id}`);
         res.send(updatedCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }  
 
 });
-
+//buy
 router.post('/carts/:cid/purchase', authMiddleware('jwt'), authRole(['user', 'premium']), async (req, res) => {
     const { cid } = req.params;
     //validate and purchase
     try {
+        console.log('intento creacion', cid);
         const ticket = await TicketManager.create(cid, req.user.email);
-        res.send(ticket);
+        logger.debug(`User ${req.user.email} bought the cart ${cid} and got the ticket ${ticket.code}`);
+        res.redirect(`/purchase-confirmation?ticketId=${ticket.id}`)
     } catch (error) {
         res.status(500).send({error : error.message});
     }

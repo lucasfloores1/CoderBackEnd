@@ -34,37 +34,43 @@ export default class CartRepository {
 
     async addProductToCart(cid, pid, uid) {
         try {
-            console.log('parametros metodo', cid,pid,uid);
             const user = await UsersService.getById(uid);
             const product = await productsRepository.getById(pid);
             if (user._id === product.owner.id) {
                 throw new Error('You cant add a product that you created')
             }
-            const cart = await this.dao.getById(cid);
-            const existingProduct = cart.products.find((product) => product.product._id.toString() === pid );  
+            const cart = await this.dao.getById(cid);     
+            const existingProduct = cart.products.find((product) => product.product._id.toString() === pid.toString());
             if (!existingProduct) {
                 const newProduct = {
                     product: pid,
                     quantity: 1
                 };
                 cart.products.push(newProduct);
-                console.log(cart);
             } else {
                 existingProduct.quantity++;
+            } 
+            let total = 0;
+            cart.products.map( (prod) => {
+                if (!prod.product.code) {
+                    total += product.price * prod.quantity;
+                } else {
+                    total += prod.product.price * prod.quantity;
+                }
             }
+            );
+            cart.total = total;
             await cart.save();
             const updatedCart = await this.dao.getById(cid);
             return new CartDTO(updatedCart);
         } catch (error) {
-            console.error('There was an error while adding the product:', error);
-            throw error;
+            throw new Error(error.message);
         }
     }
 
     async deleteProductFromCart( cid, pid ){
         try {
             const cart = await this.dao.getById(cid);
-            console.log(cart);
             const existingProductIndex = cart.products.findIndex((product) => product.product._id.toString() === pid.toString() );
 
             if (existingProductIndex === -1) {
@@ -87,6 +93,7 @@ export default class CartRepository {
                 throw new Error('Cart does not exist');
             } else {
                 cart.products = []
+                cart.total = 0;
                 await cart.save();
                 return new CartDTO(cart);
             }

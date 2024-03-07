@@ -3,6 +3,7 @@ import app from './app.js';
 import { init as initSocket } from './socket.js';
 import { init as MongoDBInit } from './db/mongodb.js';
 import config from './config/config.js';
+import { logger } from './config/logger.js';
 
 await MongoDBInit();
 
@@ -14,5 +15,5 @@ initSocket(server);
 
 //HTTP server
 server.listen(PORT, (req, res) => {
-    console.log(`Server Running into hhtp://localhost:${PORT}`);
+    logger.info(`Server Running into hhtp://localhost:${PORT}`);
 });
