@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware, createHash, generateRestorePasswordToken, __dirname } from "../../utils/utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash, generateRestorePasswordToken, __dirname, verifyToken } from "../../utils/utils.js";
 import passport from "passport";
 import UsersService from "../../services/users.service.js";
 import UserDTO from "../../dto/user.dto.js";
@@ -30,13 +30,17 @@ router.post('/auth/login', async (req, res) => {
     /*const payload = await verifyToken(token);
     req.user = payload;*/
     logger.debug(`User ${user.email} logged in`);
-    return res.redirect('/products');
+    return res.status(200).send({ status : 'success' })
+    //view
+    //return res.redirect('/products');
 });
 
 //Local Register
 router.post('/auth/register', passport.authenticate('register', { session: false }), async (req, res) => {
     try {
-      res.redirect('/login');
+      res.status(200).json({status : 'success'})
+      //views
+      //res.redirect('/login');
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -61,13 +65,31 @@ router.get('/sessions/github/callback', passport.authenticate('github', { sessio
 
 //Current
 router.get('/auth/current', authMiddleware('jwt'), async (req, res) => {
-    if (req.user) {
+     const token = req.cookies.accessToken;
+     try {
+      const payload = await verifyToken(token);
+      logger.debug(`User ${payload.email} requested his current payload`)
+      res.status(200).send({ status : 'success', payload : payload });
+    } catch (error) {
+      res.status(500).send({ error : error.message });
+    }
+    /*const { accessToken } = req.query;
+    try {
+      console.log('accessToken', accessToken);
+      const payload = await verifyToken(accessToken);
+      console.log(payload);
+      res.status(200).send({ status : 'success', payload : payload });
+    } catch (error) {
+      res.status(500).send({ error : error.message });
+    }*/
+    
+    /*if (req.user) {
       const user = new UserDTO( await UsersService.getByEmail(req.user.email) );
       
         res.status(200).json({ user : user })
     } else {
         res.status(500).send({ error : 'There was an error getting your user' })
-    }
+    }*/
 });
 
 //Logout

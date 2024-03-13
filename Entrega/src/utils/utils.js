@@ -23,7 +23,6 @@ export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSy
 export const isValidPassword = (password, user) => bcrypt.compareSync( password, user.password );
 
 //faker (MOCKING)
-
 const createRandomProduct = () => {
     let images = [];
     for (let index = 0; index < faker.number.int({ min: 1, max: 5 }); index++) {
@@ -44,12 +43,10 @@ const createRandomProduct = () => {
 
 export const generateProducts = (amount) => {
     const Products = faker.helpers.multiple( createRandomProduct, { count : amount } );
-    console.log(Products);
     return Products;
 };
 
 //jwt
-
 export const generateRestorePasswordToken = (email) => {
     const token = jwt.sign( {email}, config.jwt_secret, { expiresIn : '1h' } );
     return token;
@@ -58,7 +55,6 @@ export const generateRestorePasswordToken = (email) => {
 export const generateToken = (user) => {
     const payload = {
         id : user._id,
-        username : user.username,
         email : user.email,
         role : user.role,
         name : `${user.first_name} ${user.last_name}`,

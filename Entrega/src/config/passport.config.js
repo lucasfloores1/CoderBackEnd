@@ -7,6 +7,7 @@ import CartsManager from '../controllers/carts.controller.js';
 import config from './config.js';
 import UsersService from '../services/users.service.js';
 import userModel from '../dao/models/user.model.js';
+import { logger } from './logger.js';
 
 
 export const init = () => {
@@ -49,6 +50,7 @@ export const init = () => {
             role,
             cart : cart._id
         })
+        logger.debug(`User ${newUser.email} signed up`);
         done(null, newUser);
     }));   
 
