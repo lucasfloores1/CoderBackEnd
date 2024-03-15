@@ -10,7 +10,8 @@ export default class ProductDTO {
         this.stock = product.stock;
         this.thumbnails = product.thumbnails;
         this.type = product.type;
-        this.owner = product.owner ? new ProductUserDTO(product.owner) : { id : 'admin' };
+        this.owner = new ProductUserDTO(product.owner),
+        this.isAdmin = product.isAdmin
     }
 }
 

@@ -9,7 +9,8 @@ const ProductSchema = new mongoose.Schema({
     stock: { type: Number, required: true },
     thumbnails: { type: Array, required: true },
     type: { type: Array, required: true },
-    owner : { type : mongoose.Schema.Types.ObjectId, ref : 'User', default : null }
+    owner : { type : mongoose.Schema.Types.ObjectId, ref : 'User', default : null },
+    isAdmin: { type: Boolean, default: false }
 },{ timestamps : true });
 
 ProductSchema.pre('findOne', function (){

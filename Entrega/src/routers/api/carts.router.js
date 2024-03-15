@@ -26,18 +26,22 @@ const pm = new ProductManager(path.join(__dirname,'./products.json'));*/
         res.status(500).send({error : error.message});
     }
 });*/
+
 //get by id
 router.get( '/carts/:cid',  authMiddleware('jwt'), async (req, res) => {
     const { cid } = req.params
     try {
+        console.log(cid);
         const cart = await CartsManager.getById(cid);
-        res.send(cart);
+        res.status(200).send({ status : 'success', payload : cart})
+        //views
+        //res.send(cart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }
 });
 //add product
-router.post( '/carts/:uid/products/:pid', authMiddleware('jwt'), authRole(['user', 'premium']), async (req, res) => {
+router.post( '/carts/:uid/products/:pid', authMiddleware('jwt'), authRole(['user','admin','premium']), async (req, res) => {
     const { uid } = req.params;
     const { pid } = req.params;
     //Validate pid and uid
@@ -45,9 +49,10 @@ router.post( '/carts/:uid/products/:pid', authMiddleware('jwt'), authRole(['user
         const user = await UsersService.getById(uid);
         const product = await ProductsManager.getById(pid);
         const updatedCart = await CartsManager.addProductToCart( user.cart._id, product.id, user._id );
-        logger.debug(`User ${user.email} added the product ${product.title} to the cart ${updatedCart._id}`)
-        //res.send(updatedCart);
-        res.redirect('/products');
+        logger.debug(`User ${user.email} added the product ${product.title} to the cart ${user.cart._id}`)
+        res.status(200).send({ status : 'success', payload : updatedCart})
+        //views
+        //res.redirect('/products');
     } catch (error) {
         res.status(500).send({error : error.message});
     }
@@ -61,8 +66,10 @@ router.delete( '/carts/:cid/products/:pid', authMiddleware('jwt'), async (req, r
         const product = await ProductsManager.getById(pid);
         const cart = await CartsManager.getById(cid);
         const updatedCart = await CartsManager.deleteProductFromCart( cart.id, product.id );
-        logger.debug(`User ${req.user.email} deleted the product ${product.title} from the cart ${updatedCart._id}`)
-        res.send(updatedCart);
+        logger.debug(`User ${req.user.email} deleted the product ${product.title} from the cart ${updatedCart._id}`);
+        res.status(200).send({ status : 'success', payload : updatedCart})
+        //views
+        //res.send(updatedCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }    
@@ -75,7 +82,9 @@ router.delete( '/carts/:cid', authMiddleware('jwt'), async (req, res) => {
         const cart = await CartsManager.getById(cid);
         const updatedCart = await CartsManager.deleteAllProductsFromCart( cart.id );
         logger.debug(`User ${req.user.email} deleted the products from the cart ${updatedCart.id}`)
-        res.send(updatedCart);
+        res.status(200).send({ status : 'success', payload : updatedCart})
+        //views
+        //res.send(updatedCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }    
@@ -92,21 +101,24 @@ router.put( '/carts/:cid/products/:pid/user/:uid', authMiddleware('jwt'), async 
         const cart = await CartsManager.getById(cid);
         const updatedCart = await CartsManager.updateQuantityOfProdcut( cart.id, product.id, quantity, uid );
         logger.debug(`User ${req.user.email} added ${quantity} units of the product ${product.title} to the cart ${updatedCart._id}`);
-        res.send(updatedCart);
+        res.status(200).send({ status : 'success', payload : updatedCart})
+        //views
+        //res.send(updatedCart);
     } catch (error) {
         res.status(500).send({error : error.message});
     }  
 
 });
 //buy
-router.post('/carts/:cid/purchase', authMiddleware('jwt'), authRole(['user', 'premium']), async (req, res) => {
+router.post('/carts/:cid/purchase', authMiddleware('jwt'), authRole(['user','admin', 'premium']), async (req, res) => {
     const { cid } = req.params;
     //validate and purchase
     try {
-        console.log('intento creacion', cid);
         const ticket = await TicketManager.create(cid, req.user.email);
         logger.debug(`User ${req.user.email} bought the cart ${cid} and got the ticket ${ticket.code}`);
-        res.redirect(`/purchase-confirmation?ticketId=${ticket.id}`)
+        res.status(200).send({ status : 'success', payload : ticket})
+        //views
+        //res.redirect(`/purchase-confirmation?ticketId=${ticket.id}`)
     } catch (error) {
         res.status(500).send({error : error.message});
     }

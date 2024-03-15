@@ -30,13 +30,14 @@ export default class ProductRepository {
         let duplicatedProduct = products.find( prod => prod.code === product.code );
         if ( duplicatedProduct ){
             throw new Error('Product code already exist');
-        }       
+        }     
         const newProduct = await this.dao.create(product);
         return new ProductDTO(newProduct);
     }
 
     async updateById(pid, data) {
-        const updatedProduct = await this.dao.updateById(pid, data);
+        await this.dao.updateById(pid, data);
+        const updatedProduct = await this.dao.getById(pid);
         return new ProductDTO(updatedProduct);
     }
 

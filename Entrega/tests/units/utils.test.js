@@ -5,7 +5,6 @@ import {
     isValidPassword,
 } from "../../src/utils/utils.js";
 
-
 describe('Utils testing', function () {
     it('Should return an array of 15 products (mocking)', async function (){
         const result = generateProducts(15);

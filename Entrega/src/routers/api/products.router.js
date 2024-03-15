@@ -47,7 +47,9 @@ router.get( '/products/:pid', authMiddleware('jwt'), async (req, res) =>{
     try {
         const product = await ProductsManager.getById(pid);
         logger.debug(`User ${req.user.email} asked for the product: ${product.title}`);
-        res.send(product);
+        res.status(200).send({ status: 'success', payload : product });
+        //view
+        //res.send(product);
     } catch (error) {
         res.status(500).send({error : error.message});
     }
@@ -63,7 +65,8 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']),
             price,
             stock,
             type,
-            owner
+            owner,
+            isAdmin
          } = body
          if (
             !code ||
@@ -71,6 +74,7 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']),
             !description ||
             !price ||
             !stock ||
+            !isAdmin ||
             !type
         ) {
             CustomError.create({
@@ -82,7 +86,8 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']),
                     price,
                     stock,
                     type,
-                    owner
+                    owner,
+                    isAdmin
                 }),
                 message: 'There was an error while creating the product',
                 code: EnumsError.BAD_REQUEST_ERROR,
@@ -105,7 +110,9 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']),
         const createdProduct = await ProductsManager.create(newProduct);
         emit('productAdded', createdProduct);
         logger.debug(`User ${req.user.email} created the product: ${createdProduct.title}`);
-        res.send(createdProduct);
+        res.status(200).send({ status : 'success', payload : createdProduct})
+        //view
+        //res.send(createdProduct);
     } catch (error) {
         next(error)
     }
@@ -113,11 +120,13 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']),
 
 router.put( '/products/:pid', authMiddleware('jwt'), authRole(['admin', 'premium']), async (req, res) => {
     const { pid } = req.params;
-    const { body } = req;
+    const data = req.body;
     try {
-        const product = await ProductsManager.updateById(pid, body);
+        const product = await ProductsManager.updateById(pid, data);
         logger.debug(`User ${req.user.email} updated the product: ${product.title}`);
-        res.send(product);
+        res.status(200).send({ status: 'success', payload : product });
+        //view
+        //res.send(product);
     } catch (error) {
         res.status(500).send({error : error.message});
     }
@@ -148,8 +157,10 @@ router.put( '/products/:pid', authMiddleware('jwt'), authRole(['admin', 'premium
 router.delete('/products/:pid/user/:uid', authMiddleware('jwt'), authRole(['admin', 'premium']), async (req, res) => {
     const { pid, uid } = req.params;
     try {
+        console.log('router');
+        console.log('pid', pid, 'uid', uid);
         const user = await UsersService.getById(uid);
-        const deletedProduct = await ProductsManager.getById(pid);       
+        const deletedProduct = await ProductsManager.getById(pid);   
         if (!deletedProduct) {
             throw new Error('Product not found');
         }
@@ -161,7 +172,9 @@ router.delete('/products/:pid/user/:uid', authMiddleware('jwt'), authRole(['admi
         await ProductsManager.deleteById(pid);
         emit('productDeleted', deletedProduct.code);
         logger.debug(`User ${user.email} deleted the product: ${deletedProduct.title}`);
-        res.send(deletedProduct);
+        res.status(200).send({ status: 'success', payload : deletedProduct });
+        //view
+        //res.send(deletedProduct);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }

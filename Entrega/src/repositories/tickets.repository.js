@@ -44,7 +44,6 @@ export default class TicketRepository {
         }));
         const newTicket = await this.dao.create(data);
         const ticket = await this.dao.getById(newTicket._id);
-        console.log(ticket);
         return new TicketDTO(ticket);
     }
 

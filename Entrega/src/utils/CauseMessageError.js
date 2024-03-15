@@ -7,6 +7,8 @@ export const generatorProductError = (data) => {
   - stock         : ${data.stock}
   - code         : ${data.code}
   - type         : ${data.type}
+  - owner         : ${data.owner}
+  - isAdmin       : ${data.isAdmin}
   `;
 };
 
