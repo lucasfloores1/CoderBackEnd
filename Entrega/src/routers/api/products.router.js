@@ -94,9 +94,9 @@ router.post( '/products', authMiddleware('jwt'), authRole(['admin', 'premium']),
               })
         }
         const files = req.files;
-        const imgPath = '/img';
+        const imgPath = '/img/products';
         const filesPaths = files.map( file => file.path );
-        const defaultPath = `/img/default-product.jpg`;
+        const defaultPath = `/img/products/default-product.jpg`;
         let thumbnails = [];
         if (filesPaths) {
             thumbnails.push(defaultPath);

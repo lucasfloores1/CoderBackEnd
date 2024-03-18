@@ -7,6 +7,7 @@ import passport from 'passport';
 import config from '../config/config.js';
 import { faker } from '@faker-js/faker';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
 
 export const URL_BASE = 'http://localhost:8080/api';
 
@@ -112,10 +113,79 @@ export const authRole = (roles) => (req, res, next) => {
     next();
 };
 
+//documents
+export const checkDocuments = (documents) => {
+    let hasAddress = false;
+    let hasId = false;
+    let hasAccount = false;
+
+    for (const doc of documents) {
+        const matches = doc.reference.match(/_([^_]+)_([^_]+)\.pdf$/);
+        if (matches && matches.length >= 3) {
+            const type = matches[1].toLowerCase();
+            if (type === 'address') {
+                hasAddress = true;
+            } else if (type === 'id') {
+                hasId = true;
+            } else if (type === 'account') {
+                hasAccount = true;
+            }
+        }
+    }
+
+    return hasAddress && hasId && hasAccount;
+}
+
 //multer
+const documentStorage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        const { params: { typeFile } } = req;
+        let folderPath = null;
+        switch (typeFile) {
+          case 'profile':
+            folderPath = path.resolve(__dirname, '..', '..', 'public', 'img', 'profiles');
+            break;
+          case 'id':
+          case 'address':
+          case 'account':
+            folderPath = path.resolve(__dirname, '..', '..', 'public', 'documents');
+            break;
+          default:
+            const error = new Error('Invalid type file')
+            return callback(error);
+        }
+        fs.mkdirSync(folderPath, { recursive: true });
+        callback(null, folderPath);
+      },
+      filename: (req, file, callback) => {
+        const { user: { id }, params : { typeFile } } = req;
+        let fileName;
+        switch (typeFile) {
+            case 'profile':
+              fileName = `${id}_profile_${file.originalname}`;
+              break;
+            case 'id':
+              fileName = `${id}_id_${file.originalname}`;
+              break;
+            case 'address':
+              fileName = `${id}_address_${file.originalname}`;
+              break;
+            case 'account':
+              fileName = `${id}_account_${file.originalname}`;
+              break;
+            default:
+              const error = new Error('Invalid type file')
+              return callback(error);
+          }
+        callback(null, fileName);
+      },
+});
+
+export const documentUploader = multer({ storage : documentStorage });
+
 const storage = multer.diskStorage({
     destination : (req, file, callback) => {
-        const folderPath = path.join(__dirname, '../public/img');
+        const folderPath = path.join(__dirname, '../public/img/products');
         callback(null, folderPath);
     },
     filename : (req, file, callback) => {

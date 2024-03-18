@@ -28,4 +28,12 @@ export default class UsersService {
     static deleteById(uid) {
         return usersRepository.deleteById(uid);
     }
+
+    static uploadFile(uid, typeFile, file) {
+        return usersRepository.uploadFile(uid, typeFile, file)
+    }
+
+    static connect( email ) {
+        return usersRepository.connect( email );
+    }
 }
