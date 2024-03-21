@@ -3,11 +3,12 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as GithubStrategy } from 'passport-github2';
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 import { createHash } from '../utils/utils.js';
-import CartsManager from '../controllers/carts.controller.js';
+import CartController from '../controllers/carts.controller.js';
 import config from './config.js';
 import UsersService from '../services/users.service.js';
 import userModel from '../dao/models/user.model.js';
 import { logger } from './logger.js';
+import { InvalidDataException, UnauthorizedException } from '../utils/exception.js';
 
 
 export const init = () => {
@@ -34,13 +35,13 @@ export const init = () => {
             !age ||
             !password
         ){
-            return done(new Error('All fields are required'))
+            return done(new InvalidDataException('All the fields are required'))
         }
         const user = await UsersService.getByEmail(email)
         if (user){
-            return done(new Error('This email is already used'))
+            return done(new UnauthorizedException('This email is already used'))
         }
-        const cart = await CartsManager.create();
+        const cart = await CartController.create();
         const newUser = await UsersService.create({
             first_name,
             last_name,
@@ -84,7 +85,7 @@ export const init = () => {
         if (user) {
             return done(null, user);
         }
-        const cart = await CartsManager.create();
+        const cart = await CartController.create();
         const githubUser = {
             first_name : profile._json.name.split(' ')[0],
             last_name : profile._json.name.split(' ')[1],

@@ -1,14 +1,10 @@
 import express from 'express';
 import path from 'path';
 import { __dirname } from './utils/utils.js';
-import handlebars, { create as hbscreate } from 'express-handlebars';
+import { create as hbscreate } from 'express-handlebars';
 import cookieParser from 'cookie-parser';
-/*import sessions from 'express-session';
-import MongoStorage from 'connect-mongo'*/
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
-import { logger } from './config/logger.js';
-
 import passport from 'passport';
 import { init as passportInit } from './config/passport.config.js';
 import productsRoter from './routers/api/products.router.js';
@@ -21,22 +17,8 @@ import { addLogger } from './config/logger.js';
 
 const app = express();
 
-//const SECRET_KEY = `a0A9U9qUkEwc`;
-
 app.use(cookieParser(config.cookie_secret));
 app.use(addLogger);
-
-//sessions deprecated
-/*app.use(sessions({
-    store : MongoStorage.create({
-        mongoUrl: URI,
-        mongoOptions: {},
-        ttl : 60*30,
-    }),
-    secret : SECRET_KEY,
-    resave : true,
-    saveUninitialized : true,
-}));*/
 
 //docs
 if (config.env !== 'prod') {

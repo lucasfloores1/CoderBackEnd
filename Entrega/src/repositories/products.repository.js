@@ -1,10 +1,4 @@
-import path from 'path';
-import { __dirname } from '../utils/utils.js';
-import fs from 'fs';
 import ProductDTO from '../dto/product.dto.js';
-import EnumsError from '../utils/EnumsError.js';
-import { CustomError } from '../utils/CustomError.js';
-import { generatorProductError } from '../utils/CauseMessageError.js';
 
 export default class ProductRepository {
 
@@ -19,18 +13,9 @@ export default class ProductRepository {
 
     async getById(pid) {
         const product = await this.dao.getById(pid);
-        if (!product) {
-            throw new Error('Product not found');
-        }
         return new ProductDTO(product);
     }
-    async create(product) {
-        //Validate code
-        const products = await this.getAll();
-        let duplicatedProduct = products.find( prod => prod.code === product.code );
-        if ( duplicatedProduct ){
-            throw new Error('Product code already exist');
-        }     
+    async create(product) {     
         const newProduct = await this.dao.create(product);
         return new ProductDTO(newProduct);
     }
@@ -42,29 +27,12 @@ export default class ProductRepository {
     }
 
     async deleteById(pid) {
-        try {
-            const deletedProduct = await this.dao.getById(pid);
-            const defaultImgPath = '/img/default-product.jpg';
-            //Delete IMGS from PUBLIC
-            if (!deletedProduct.thumbnails.includes(defaultImgPath)) {
-                deletedProduct.thumbnails.forEach((thumbnail) => {
-                    const filePath = path.join(__dirname, `../../public/${thumbnail}`);
-                    fs.unlinkSync(filePath);
-                });
-            }
-            await this.dao.deleteById(pid);
-        } catch (error) {
-            throw new Error(error.message);
-        }
+        return await this.dao.deleteById(pid);
     }
 
     async getPaginatedProducts (criteria, options){
-        try {
-            const result = await this.dao.getPaginatedProducts(criteria, options);
-            return result;
-        } catch (error) {
-            throw new Error('There was an error while getting the products');
-        }
+        const result = await this.dao.getPaginatedProducts(criteria, options);
+        return result;
     }
 
 }

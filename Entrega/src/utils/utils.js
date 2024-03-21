@@ -136,6 +136,25 @@ export const checkDocuments = (documents) => {
     return hasAddress && hasId && hasAccount;
 }
 
+//Product Router
+export const BodyProductSetter = async (req) => {
+    const { body, files } = req
+    const imgPath = '/img/products';
+    const filesPaths = files.map( file => file.path );
+    const defaultPath = `/img/products/default-product.jpg`;
+    let thumbnails = [];
+    if (filesPaths) {
+        thumbnails.push(defaultPath);
+    } else {
+        thumbnails = filesPaths.map(filePath => filePath.replace(/\\/g, '/').replace(/.*img/, imgPath))
+    }
+    const newProduct = {
+        ...body,
+        thumbnails
+    }
+    return newProduct;
+}
+
 //multer
 const documentStorage = multer.diskStorage({
     destination: (req, file, callback) => {
@@ -222,4 +241,17 @@ export const buildResponsePaginated = (data, baseUrl = URL_BASE) => {
       //hasPages: Ayuda para renderizar paginacion en handlebars
       hasPagination: data.hasNextPage || data.hasPrevPage,
     };  
-  };
+};
+
+export const getPaginatedOpts = ( limit, page, sort, search ) => {
+    const criteria = {};
+    const options = { limit, page }
+    if (sort) { 
+        options.sort = { price: sort };
+    }
+    if (search) {
+        criteria.type = search;
+    }
+    const data = { criteria, options }
+    return data;
+}
