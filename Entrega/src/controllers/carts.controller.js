@@ -36,7 +36,7 @@ export default class CartController {
         if (user._id === product.owner.id && user.role !== 'admin') {
             throw new UnauthorizedException('You cant add a product that you created')
         }
-        const cart = await CartsService.getById(user.cart._id);
+        const cart = await CartsService.getRawById(user.cart._id);
         const existingProduct = cart.products.find((product) => product.product._id.toString() === pid.toString());
         if (!existingProduct) {
             const newProduct = {
@@ -57,9 +57,9 @@ export default class CartController {
         });
         cart.total = total;
         await cart.save();
-        const updatedCart = await CartsService.getById(cid);
+        const updatedCart = await CartsService.getById(user.cart._id);
         logger.debug(`User ${user.email} added the product ${product.title} to the cart ${user.cart._id}`)
-        return new CartDTO(updatedCart);
+        return updatedCart;
     }
 
     static async deleteProductFromCart( cid, pid ){

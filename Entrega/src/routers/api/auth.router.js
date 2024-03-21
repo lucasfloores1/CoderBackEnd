@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware, createHash, __dirname, verifyToken, documentUploader } from "../../utils/utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash, __dirname, verifyToken, documentUploader, authRole } from "../../utils/utils.js";
 import passport from "passport";
 import { logger } from "../../config/logger.js";
 import AuthController from "../../controllers/auth.controller.js";
@@ -135,6 +135,31 @@ router.post('/auth/users/current/documents/:typeFile', authMiddleware('jwt'), do
       send({ status: 'success' });
   } catch (error) {
     next(error);
+  }
+});
+
+//Get Reduced Users
+router.get('/auth/users', authMiddleware('jwt'), async (req, res, next) => {
+  try {
+    const users = await UserController.getReducedUsers();
+    logger.debug('The list of reduced info users was requested');
+    res.
+      status(200).
+      send({ status : 'success', payload : users });
+  } catch (error) {
+    next(error);
+  }
+});
+
+//Delete Unactive Users
+router.delete('/auth/users', authMiddleware('jwt'), authRole(['admin']), async (req, res, next) => {
+  try {
+    await UserController.deleteUnactives()
+    res.
+      status(200).
+      send({ status : 'success', message : 'Unactive users deleted' });
+  } catch (error) {
+    next(error)
   }
 });
 

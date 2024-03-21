@@ -33,7 +33,7 @@ export default class TicketController {
             }
         }));
         const ticket = await TicketsService.create(data);
-        return new TicketDTO(ticket);
+        return ticket;
     }
 
     static getById(tid) {

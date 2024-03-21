@@ -1,5 +1,3 @@
-import UserDTO from "./user.dto.js";
-
 export default class ProductDTO {
     constructor(product) {
         this.id = product._id;

@@ -1,9 +1,13 @@
+import path from "path";
 import { logger } from "../config/logger.js";
+import EmailService from "../services/email.service.js";
 import ProductsService from "../services/products.service.js";
 import { emit } from "../socket.js";
 import { InvalidDataException, NotFoundException, UnauthorizedException } from "../utils/exception.js";
 import UserController from "./users.controller.js";
 import fs from 'fs'
+import { __dirname } from "../utils/utils.js";
+import handlebars from "handlebars";
 
 export default class ProductController {
 
@@ -47,8 +51,13 @@ export default class ProductController {
             if ( user._id.toString() !== deletedProduct.owner.id.toString() ) {
                 throw new UnauthorizedException('You cannot delete a product that you did not create');
             }
+            const emailService = EmailService.getInstance();
+            const source = fs.readFileSync(path.join(__dirname, '../views/delete-product-email.handlebars'), 'utf8');
+            const template = handlebars.compile(source);
+            const html = template({ user, product : deletedProduct });
+            await emailService.sendEmail(user.email, 'Link to restore your password', html);    
         }
-        const defaultImgPath = '/img/default-product.jpg';
+        const defaultImgPath = '/img/products/default-product.jpg';
         //Delete IMGS from PUBLIC
         if (!deletedProduct.thumbnails.includes(defaultImgPath)) {
             deletedProduct.thumbnails.forEach((thumbnail) => {

@@ -1,4 +1,11 @@
 import UsersService from "../services/users.service.js";
+import EmailService from "../services/email.service.js";
+import handlebars from "handlebars";
+import fs from 'fs'
+import path from "path";
+import { checkLastConnection, __dirname } from "../utils/utils.js";
+import { logger } from "../config/logger.js";
+import { ReducedUserDTO } from "../dto/user.dto.js";
 
 export default class UserController {
 
@@ -6,6 +13,11 @@ export default class UserController {
         const user = await UsersService.getById(uid);
         user.documents.push({ name : file.originalname , reference : file.path });
         await user.save();
+    }
+
+    static async getReducedUsers() {
+        const users = await UsersService.getRaw();
+        return users.map( (user) => new ReducedUserDTO(user) );
     }
 
     static async getByEmail(email) {
@@ -40,5 +52,20 @@ export default class UserController {
     static async create(data) {
         const user = await UsersService.create(data);
         return user;
+    }
+
+    static async deleteUnactives() {
+        const users = await UsersService.getRaw();
+        users.map( async (user) => {
+            if ( checkLastConnection(user) ) {
+                await UsersService.deleteById(user.id);
+                logger.debug(`User ${user.email} was deleted for being inactive for more than 2 days`);
+                const emailService = EmailService.getInstance();
+                const source = fs.readFileSync(path.join(__dirname, '../views/delete-product-email.handlebars'), 'utf8');
+                const template = handlebars.compile(source);
+                const html = template({ user });
+                await emailService.sendEmail(user.email, 'Link to restore your password', html);
+            }
+        });       
     }
 }

@@ -27,6 +27,7 @@ router.post( '/carts/:uid/products/:pid', authMiddleware('jwt'), authRole(['user
         const { uid } = req.params;
         const { pid } = req.params;
         const updatedCart = await CartController.addProductToCart( pid, uid );
+        console.log(updatedCart);
         res.
             status(200).
             send({ status : 'success', payload : updatedCart})

@@ -47,6 +47,17 @@ export const generateProducts = (amount) => {
     return Products;
 };
 
+//Users
+export const checkLastConnection = (user) => {
+    const rightNow = new Date;
+    const today = new Date( rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate() );
+    const last_connection = new Date(user.last_connection);
+    const lastConnectionDate = new Date( last_connection.getFullYear(), last_connection.getMonth(), last_connection.getDate() );
+    const timeDifference = today - lastConnectionDate;
+    const pastDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    return pastDays > 2
+}
+
 //jwt
 export const generateRestorePasswordToken = (email) => {
     const token = jwt.sign( {email}, config.jwt_secret, { expiresIn : '1h' } );

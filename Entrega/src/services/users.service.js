@@ -6,6 +6,10 @@ export default class UsersService {
         return usersRepository.getAll(filter);
     }
 
+    static getRaw() {
+        return usersRepository.getRaw();
+    }
+
     static create(data) {
         return usersRepository.create(data);
     }

@@ -11,6 +11,11 @@ export default class UserRepository {
         return users.map( user => new UserDTO(user) );
     }
 
+    async getRaw() {
+        const users = await this.dao.getAll();
+        return users;
+    }
+
     async getById(uid) {
         const user = await this.dao.getById(uid);
         return user;
