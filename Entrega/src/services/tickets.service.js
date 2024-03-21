@@ -5,8 +5,8 @@ export default class TicketsService {
         return ticketsRepository.getAll(filter);
     }
 
-    static create(cid, email) {
-        return ticketsRepository.create(cid, email);
+    static create(data) {
+        return ticketsRepository.create(data);
     }
 
     static getById(tid) {

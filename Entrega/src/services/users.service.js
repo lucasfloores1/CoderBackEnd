@@ -1,6 +1,7 @@
 import { usersRepository } from "../repositories/index.js";
 
 export default class UsersService {
+    
     static getAll (filter = {}) {
         return usersRepository.getAll(filter);
     }
@@ -29,11 +30,4 @@ export default class UsersService {
         return usersRepository.deleteById(uid);
     }
 
-    static uploadFile(uid, typeFile, file) {
-        return usersRepository.uploadFile(uid, typeFile, file)
-    }
-
-    static connect( email ) {
-        return usersRepository.connect( email );
-    }
 }
