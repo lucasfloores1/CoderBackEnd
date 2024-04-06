@@ -9,7 +9,7 @@
     "test": "mocha --timeout 10000 ./tests/**/*.test.js",
     "test:integrations": "mocha --timeout 10000 ./tests/integrations/*.test.js",
     "test:units": "mocha --timeout 10000 ./tests/units/*.test.js",
-    "start": "node ."
+    "start": "node src/app.js"
   },
   "author": "",
   "license": "ISC",
