@@ -11,6 +11,11 @@ export default class UserRepository {
         return users.map( user => new UserDTO(user) );
     }
 
+    async getRaw() {
+        const users = await this.dao.getAll();
+        return users;
+    }
+
     async getById(uid) {
         const user = await this.dao.getById(uid);
         return user;
@@ -38,23 +43,6 @@ export default class UserRepository {
 
     async deleteById(uid) {
         return await this.dao.deleteById(uid);
-    }
-
-    async uploadFile(uid, file) {
-        const user = await this.dao.getById(uid);
-        user.documents.push({ name : file.originalname , reference : file.path });
-        await user.save();
-        const updatedUser = await this.dao.getById(uid);
-        return updatedUser;
-    }
-
-    async connect( email ) {
-        const data = {
-            last_connection : Date.now()
-        }
-        await this.dao.updateByEmail( email, data )
-        const user = await this.dao.getByEmail(email);
-        return user;
     }
     
 }

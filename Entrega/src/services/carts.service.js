@@ -9,23 +9,15 @@ export default class CartsService {
         return cartsRepository.getById(cid);
     }
 
-    static create() {
-        return cartsRepository.create();
+    static create(data) {
+        return cartsRepository.create(data);
     }
 
-    static addProductToCart(cid, pid, uid) {
-        return cartsRepository.addProductToCart(cid, pid, uid);
+    static deleteById(cid) {
+        return cartsRepository.deleteById(cid);
     }
 
-    static deleteProductFromCart( cid, pid ) {
-        return cartsRepository.deleteProductFromCart(cid, pid);
-    }
-    
-    static deleteAllProductsFromCart( cid ) {
-        return cartsRepository.deleteAllProductsFromCart( cid );
-    }
-
-    static updateQuantityOfProduct( cid, pid, quantity ){
-        return cartsRepository.updateQuantityOfProdcut( cid, pid, quantity );
+    static getRawById(cid) {
+        return cartsRepository.getRawById(cid);
     }
 }

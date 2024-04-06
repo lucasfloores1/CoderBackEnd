@@ -47,6 +47,17 @@ export const generateProducts = (amount) => {
     return Products;
 };
 
+//Users
+export const checkLastConnection = (user) => {
+    const rightNow = new Date;
+    const today = new Date( rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate() );
+    const last_connection = new Date(user.last_connection);
+    const lastConnectionDate = new Date( last_connection.getFullYear(), last_connection.getMonth(), last_connection.getDate() );
+    const timeDifference = today - lastConnectionDate;
+    const pastDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+    return pastDays > 2
+}
+
 //jwt
 export const generateRestorePasswordToken = (email) => {
     const token = jwt.sign( {email}, config.jwt_secret, { expiresIn : '1h' } );
@@ -136,6 +147,25 @@ export const checkDocuments = (documents) => {
     return hasAddress && hasId && hasAccount;
 }
 
+//Product Router
+export const BodyProductSetter = async (req) => {
+    const { body, files } = req
+    const imgPath = '/img/products';
+    const filesPaths = files.map( file => file.path );
+    const defaultPath = `/img/products/default-product.jpg`;
+    let thumbnails = [];
+    if (filesPaths) {
+        thumbnails.push(defaultPath);
+    } else {
+        thumbnails = filesPaths.map(filePath => filePath.replace(/\\/g, '/').replace(/.*img/, imgPath))
+    }
+    const newProduct = {
+        ...body,
+        thumbnails
+    }
+    return newProduct;
+}
+
 //multer
 const documentStorage = multer.diskStorage({
     destination: (req, file, callback) => {
@@ -202,7 +232,9 @@ export const buildResponsePaginated = (data, baseUrl = URL_BASE) => {
       //status:success/error
       status: 'success',
       //payload: Resultado de los productos solicitados
-      payload: data.docs.map((doc) => doc.toJSON()),
+      payload: data.docs.map((doc) => doc),
+      //TotalDocs: Total de resultados
+      totalDocs: data.totalDocs,
       //totalPages: Total de páginas
       totalPages: data.totalPages,
       //prevPage: Página anterior
@@ -222,4 +254,17 @@ export const buildResponsePaginated = (data, baseUrl = URL_BASE) => {
       //hasPages: Ayuda para renderizar paginacion en handlebars
       hasPagination: data.hasNextPage || data.hasPrevPage,
     };  
-  };
+};
+
+export const getPaginatedOpts = ( limit, page, sort, search ) => {
+    const criteria = {};
+    const options = { limit, page }
+    if (sort) { 
+        options.sort = { price: sort };
+    }
+    if (search) {
+        criteria.type = search;
+    }
+    const data = { criteria, options }
+    return data;
+}

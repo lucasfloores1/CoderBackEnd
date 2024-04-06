@@ -11,3 +11,11 @@ export default class UserDTO {
         this.documents = user.documents
     }
 }
+
+export class ReducedUserDTO {
+    constructor(user) {
+        this.fullname = `${user.first_name} ${user.last_name}`;
+        this.email = user.email;
+        this.role = user.role;
+    }
+}

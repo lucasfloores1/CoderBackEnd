@@ -1,177 +1,172 @@
 import { Router } from "express";
-import { isValidPassword, generateToken, authMiddleware, createHash, generateRestorePasswordToken, __dirname, verifyToken, documentUploader, checkDocuments } from "../../utils/utils.js";
+import { isValidPassword, generateToken, authMiddleware, createHash, __dirname, verifyToken, documentUploader, authRole } from "../../utils/utils.js";
 import passport from "passport";
-import UsersService from "../../services/users.service.js";
-import UserDTO from "../../dto/user.dto.js";
-import EmailService from "../../services/email.service.js";
-import fs from 'fs';
-import handlebars from 'handlebars';
-import path from 'path';
 import { logger } from "../../config/logger.js";
-import { Logger } from "winston";
+import AuthController from "../../controllers/auth.controller.js";
+import UserController from "../../controllers/users.controller.js";
 
 const router = Router();
 
 //Local Login
-router.post('/auth/login', async (req, res) => {
-    const { email, password } = req.body;
-    const user = await UsersService.connect(email);
-    if (!user) {
-        return res.status(401).json({ message: 'Email or password are wrong' });
-    }
-    const isNotValidPassword = !isValidPassword(password, user);
-    if (isNotValidPassword) {
-        res.status(401).json({ message : 'email or password are wrong' })
-    }
-    const token = generateToken(user);
-    res.cookie('accessToken', token, {
-        maxAge: 12 * 60 * 60 * 1000,//12 hours
-        httpOnly: true,
-    });
-    /*const payload = await verifyToken(token);
-    req.user = payload;*/
-    logger.debug(`User ${user.email} logged in`);
-    return res.status(200).send({ status : 'success' })
+router.post('/auth/login', async (req, res, next) => {
+  try {
+    const { body } = req;
+    const token = await AuthController.login(body);
+    logger.debug(`User ${body.email} logged in`);
+    res.
+        cookie('accessToken', token, { maxAge: 5 * 60 * 60* 1000, sameSite : 'none', secure : true}).
+        status(200).
+        send({ status: 'success' , message : 'Logged in' })
     //view
     //return res.redirect('/products');
+  } catch (error) {
+    next(error);
+  }
 });
 
 //Local Register
-router.post('/auth/register', passport.authenticate('register', { session: false }), async (req, res) => {
+router.post('/auth/register', passport.authenticate('register', { session: false }), async (req, res, next) => {
     try {
-      res.status(200).json({status : 'success'})
+      res.status(200).json({ status : 'success', message : 'Signed up' })
       //views
       //res.redirect('/login');
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      next(error);
     }
 });
 
 //Github
 router.get('/sessions/github', passport.authenticate('github', { scope: ['user:email']}));
 
-router.get('/sessions/github/callback', passport.authenticate('github', { session: false }), async (req, res) => {
+router.get('/sessions/github/callback', passport.authenticate('github', { session: false }), async (req, res, next) => {
   try {
-    await UsersService.connect(req.user.email);
+    await AuthController.connect(req.user.email);
     const token = generateToken(req.user);
-    res.cookie('accessToken', token, {
-        maxAge: 12 * 60 * 60 * 1000,//12 hours
-        httpOnly: true,
-    });
-    res.redirect('/products');
+    res.
+        status(200).
+        cookie('accessToken', token, { maxAge: 5 * 60 * 60* 1000, sameSite : 'none', secure : true}).
+        send({ status: 'success' })
+    //views
+    //res.redirect('/products');
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
 //Current
-router.get('/auth/current', authMiddleware('jwt'), async (req, res) => {
-     const token = req.cookies.accessToken;
+router.get('/auth/current', authMiddleware('jwt'), async (req, res, next) => {
      try {
+      const token = req.cookies.accessToken;
       const payload = await verifyToken(token);
-      logger.debug(`User ${payload.email} requested his current payload`)
-      res.status(200).send({ status : 'success', payload : payload });
+      logger.debug(`User ${payload.email} requested his data`)
+      res.
+        status(200).
+        send({ status : 'success', payload });
     } catch (error) {
-      res.status(500).send({ error : error.message });
+      next(error);
     }
-    /*const { accessToken } = req.query;
-    try {
-      console.log('accessToken', accessToken);
-      const payload = await verifyToken(accessToken);
-      console.log(payload);
-      res.status(200).send({ status : 'success', payload : payload });
-    } catch (error) {
-      res.status(500).send({ error : error.message });
-    }*/
-    
-    /*if (req.user) {
-      const user = new UserDTO( await UsersService.getByEmail(req.user.email) );
-      
-        res.status(200).json({ user : user })
-    } else {
-        res.status(500).send({ error : 'There was an error getting your user' })
-    }*/
 });
 
 //Logout
-router.get('/auth/logout',authMiddleware('jwt'), async (req, res) => {
-  await UsersService.connect(req.user.email);
-  res.clearCookie('accessToken');
-  req.user = null;
-  res.redirect('/login');
-});
-
-//Restore Password
-router.post('/auth/restore-password/email', async (req, res) => {
-  const { email } = req.body;
+router.get('/auth/logout',authMiddleware('jwt'), async (req, res, next) => {
   try {
-    const user = await UsersService.getByEmail(email);
-    const token = generateRestorePasswordToken(user.email)
-    const emailService = EmailService.getInstance();
-    const source = fs.readFileSync(path.join(__dirname, '../views/restore-pw-email-template.handlebars'), 'utf8');
-    const template = handlebars.compile(source);
-    const html = template({ token })
-
-    const result = await emailService.sendEmail(user.email, 'Link to restore your password', html);
-    res.status(200).json(result);
+    await AuthController.connect(req.user.email);
+    req.user = null;
+    res.
+      clearCookie('accessToken').
+      status(200).
+      send({ status : 'success', message : 'Logged out' })
+    //views
+    //res.redirect('/login');
   } catch (error) {
-    res.status(500).send({ error : error.message })
+    next(error);
   }
 });
 
-router.post('/auth/restore-password', async (req, res) => {
-  const { email, password } = req.body;
+//Restore Password
+router.post('/auth/restore-password/email', async (req, res, next) => {
   try {
-    const user = await UsersService.getByEmail(email);
+    const { email } = req.body;
+    console.log(email);
+    await AuthController.sendEmailRestorePassword(email);
+    res.
+      status(200).
+      send({ status : 'success', message : 'Email sent' })
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/auth/restore-password/:token', async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const { token } = req.params;
+    verifyToken(token);
+    const user = await UserController.getByEmail(email);
     if (isValidPassword(password, user)) {
-      res.render('restore-pw', { email, repeated : true })
+      res.
+      status(200).
+      send({ status : 'success', message : 'Password repeated' });
     }
     const newPassword = createHash(password);
-    await UsersService.updateByEmail(email, { password : newPassword });
-    res.render('login');
+    await UserController.updateByEmail(email, { password : newPassword });
+    res.
+      status(200).
+      send({ status : 'success', message : 'Password restored' })
   } catch (error) {
-    res.status(500).send({ error : 'There was an error while restoring your password' })
+    next(error);
   }
 });
 
 //Premium User
-router.get('/auth/users/premium/:uid', async (req,res) => {
+router.get('/auth/users/premium/:uid', async (req,res,next) => {
   const { uid } = req.params;
   try {
-    const user = await UsersService.getById(uid);
-    switch (user.role) {
-      case 'admin':
-        throw new Error('admin cant get premium role');
-      case 'user':
-        if ( checkDocuments( user.documents ) ) {
-          await UsersService.updateById( uid, { role : 'premium' } );
-          const newPremiumUser = await UsersService.getById(uid);
-          logger.debug(`User ${newPremiumUser.email} got upgraded to premium user`);
-          return res.status(200).send({ status : 'success', payload : newPremiumUser });
-        }
-        throw new Error('User did not uploaded all the documents required yet')
-      case 'premium':
-        await UsersService.updateById( uid, { role : 'user' } );
-        const newUser = await UsersService.getById(uid);
-        logger.debug(`User ${newUser.email} got downgraded to regular user`);
-        return res.status(200).send({ status : 'success', payload : newUser });
-      default:
-        throw new Error('something was wrong');
-    }
+    const user = await AuthController.premiumUser(uid);
+    res.
+      status(200).
+      send({ status : 'success', message : `User ${user.email} updated` });
   } catch (error) {
-    res.status(500).send({ error : error.message })
+    next(error);
   }
 });
 
 //Document uploading
-router.post('/auth/users/current/documents/:typeFile', authMiddleware('jwt'), documentUploader.single('file'), async (req,res) => {
+router.post('/auth/users/current/documents/:typeFile', authMiddleware('jwt'), documentUploader.single('file'), async (req,res,next) => {
   try {
     const { user, file, params : { typeFile } }= req
-    await UsersService.uploadFile(user.id, file);
+    await UserController.uploadFile(user.id, file);
     logger.debug(`User ${user.email} uploaded the ${typeFile} file named ${file.originalname}`)
-    res.status(200).send({ status: 'success' })
+    res.
+      status(200).
+      send({ status: 'success' });
   } catch (error) {
-    res.status(500).send({ error : error.message })
+    next(error);
+  }
+});
+
+//Get Reduced Users
+router.get('/auth/users', authMiddleware('jwt'), async (req, res, next) => {
+  try {
+    const users = await UserController.getReducedUsers();
+    logger.debug('The list of reduced info users was requested');
+    res.
+      status(200).
+      send({ status : 'success', payload : users });
+  } catch (error) {
+    next(error);
+  }
+});
+
+//Delete Unactive Users
+router.delete('/auth/users', authMiddleware('jwt'), authRole(['admin']), async (req, res, next) => {
+  try {
+    await UserController.deleteUnactives()
+    res.
+      status(200).
+      send({ status : 'success', message : 'Unactive users deleted' });
+  } catch (error) {
+    next(error)
   }
 });
 

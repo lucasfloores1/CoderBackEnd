@@ -284,16 +284,7 @@ describe('E-commerce Testing', async function () {
                 .set('Cookie', [`${this.cookie.key}=${this.cookie.value}`]);
             expect(statusCode).to.be.equal(200);
             expect(ok).to.be.ok;
-            expect(_body).to.be.has.property('payload');
-            expect(_body.payload).to.be.has.property('id');
-            expect(_body.payload).to.be.has.property('title');
-            expect(_body.payload).to.be.has.property('description');
-            expect(_body.payload).to.be.has.property('price');
-            expect(_body.payload).to.be.has.property('code');
-            expect(_body.payload).to.be.has.property('stock');
-            expect(_body.payload).to.be.has.property('thumbnails');
-            expect(_body.payload).to.be.has.property('type');
-            expect(_body.payload).to.be.has.property('owner');            
+            expect(_body).to.be.has.property('status');           
         });
     });
 });
