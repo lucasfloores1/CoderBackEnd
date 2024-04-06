@@ -14,8 +14,8 @@ router.post('/auth/login', async (req, res, next) => {
     const token = await AuthController.login(body);
     logger.debug(`User ${body.email} logged in`);
     res.
+        cookie('accessToken', token, { maxAge: 5 * 60 * 60* 1000, sameSite : 'none', secure : true}).
         status(200).
-        cookie('accessToken', token, { maxAge: 5 * 60 * 60* 1000, httpOnly : true }).
         send({ status: 'success' , message : 'Logged in' })
     //view
     //return res.redirect('/products');
@@ -44,7 +44,7 @@ router.get('/sessions/github/callback', passport.authenticate('github', { sessio
     const token = generateToken(req.user);
     res.
         status(200).
-        cookie('accessToken', token, { maxAge: 5 * 60 * 60* 1000, httpOnly : true }).
+        cookie('accessToken', token, { maxAge: 5 * 60 * 60* 1000, sameSite : 'none', secure : true}).
         send({ status: 'success' })
     //views
     //res.redirect('/products');
@@ -87,25 +87,32 @@ router.get('/auth/logout',authMiddleware('jwt'), async (req, res, next) => {
 router.post('/auth/restore-password/email', async (req, res, next) => {
   try {
     const { email } = req.body;
-    const result = await AuthController.sendEmailRestorePassword(email);
+    console.log(email);
+    await AuthController.sendEmailRestorePassword(email);
     res.
       status(200).
-      send(result);
+      send({ status : 'success', message : 'Email sent' })
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/auth/restore-password', async (req, res) => {
-  const { email, password } = req.body;
+router.post('/auth/restore-password/:token', async (req, res, next) => {
   try {
+    const { email, password } = req.body;
+    const { token } = req.params;
+    verifyToken(token);
     const user = await UserController.getByEmail(email);
     if (isValidPassword(password, user)) {
-      res.render('restore-pw', { email, repeated : true })
+      res.
+      status(200).
+      send({ status : 'success', message : 'Password repeated' });
     }
     const newPassword = createHash(password);
     await UserController.updateByEmail(email, { password : newPassword });
-    res.render('login');
+    res.
+      status(200).
+      send({ status : 'success', message : 'Password restored' })
   } catch (error) {
     next(error);
   }
@@ -118,7 +125,7 @@ router.get('/auth/users/premium/:uid', async (req,res,next) => {
     const user = await AuthController.premiumUser(uid);
     res.
       status(200).
-      send({ status : 'success', payload : user });
+      send({ status : 'success', message : `User ${user.email} updated` });
   } catch (error) {
     next(error);
   }

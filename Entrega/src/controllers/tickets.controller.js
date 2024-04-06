@@ -33,6 +33,7 @@ export default class TicketController {
             }
         }));
         const ticket = await TicketsService.create(data);
+        await CartController.deleteAllProductsFromCart(cart.id);
         return ticket;
     }
 

@@ -13,7 +13,7 @@ router.get( '/products', authMiddleware('jwt'), async (req, res, next) =>{
         const { limit = 10, page = 1, sort, search } = req.query;
         const data = getPaginatedOpts(limit, page, sort, search);
         const result = await ProductController.getPaginatedProducts(data.criteria, data.options);
-        logger.debug(`User ${req.user.email} asked for a list of ${result.lenght} products`);
+        logger.debug(`User ${req.user.email} asked for a list of ${result.totalDocs} products`);
         res.
             status(200).
             json( buildResponsePaginated( { ...result, sort, search } ) );        

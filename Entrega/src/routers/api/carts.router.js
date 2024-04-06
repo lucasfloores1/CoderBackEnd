@@ -27,10 +27,9 @@ router.post( '/carts/:uid/products/:pid', authMiddleware('jwt'), authRole(['user
         const { uid } = req.params;
         const { pid } = req.params;
         const updatedCart = await CartController.addProductToCart( pid, uid );
-        console.log(updatedCart);
         res.
             status(200).
-            send({ status : 'success', payload : updatedCart})
+            send({ status : 'success', payload : updatedCart, message : 'Product added'})
         //views
         //res.redirect('/products');
     } catch (error) {
@@ -47,7 +46,7 @@ router.delete( '/carts/:cid/products/:pid', authMiddleware('jwt'), async (req, r
         logger.debug(`User ${req.user.email} deleted the product ${pid} from the cart ${updatedCart._id}`);
         res.
             status(200).
-            send({ status : 'success', payload : updatedCart});
+            send({ status : 'success', payload : updatedCart, message : 'Product deleted'});
         //views
         //res.send(updatedCart);
     } catch (error) {
@@ -63,7 +62,7 @@ router.delete( '/carts/:cid', authMiddleware('jwt'), async (req, res, next) => {
         logger.debug(`User ${req.user.email} deleted the products from the cart ${updatedCart.id}`)
         res.
             status(200).
-            send({ status : 'success', payload : updatedCart});
+            send({ status : 'success', payload : updatedCart, message : 'Products deleted'});
         //views
         //res.send(updatedCart);
     } catch (error) {
@@ -77,10 +76,10 @@ router.put( '/carts/:cid/products/:pid/user/:uid', authMiddleware('jwt'), async 
         const { cid, pid, uid } = req.params;
         const { quantity } = req.body;
         const updatedCart = await CartController.updateQuantityOfProdcut( cid, pid, quantity, uid );
-        logger.debug(`User ${req.user.email} added ${quantity} units of the product ${pid} to the cart ${updatedCart._id}`);
+        logger.debug(`User ${req.user.email} changed the quantity to ${quantity} units of the product ${pid} to the cart ${updatedCart._id}`);
         res.
             status(200).
-            send({ status : 'success', payload : updatedCart});
+            send({ status : 'success', payload : updatedCart, message : 'Product updated'});
         //views
         //res.send(updatedCart);
     } catch (error) {

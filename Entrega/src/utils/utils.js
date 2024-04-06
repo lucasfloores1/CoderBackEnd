@@ -232,7 +232,9 @@ export const buildResponsePaginated = (data, baseUrl = URL_BASE) => {
       //status:success/error
       status: 'success',
       //payload: Resultado de los productos solicitados
-      payload: data.docs.map((doc) => doc.toJSON()),
+      payload: data.docs.map((doc) => doc),
+      //TotalDocs: Total de resultados
+      totalDocs: data.totalDocs,
       //totalPages: Total de páginas
       totalPages: data.totalPages,
       //prevPage: Página anterior

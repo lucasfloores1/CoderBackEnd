@@ -35,6 +35,7 @@ export default class AuthController {
         const template = handlebars.compile(source);
         const html = template({ token })    
         const result = await emailService.sendEmail(user.email, 'Link to restore your password', html);
+        logger.debug(`An email was sent to ${user.email} to restore the password`);
         return result;
     }
 

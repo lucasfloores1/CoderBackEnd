@@ -33,6 +33,7 @@ export default class CartController {
     static async addProductToCart(pid, uid) {
         const user = await UserController.getById(uid);
         const product = await ProductsManager.getById(pid);
+        console.log(product);
         if (user._id === product.owner.id && user.role !== 'admin') {
             throw new UnauthorizedException('You cant add a product that you created')
         }
@@ -92,7 +93,7 @@ export default class CartController {
 
     }
 
-    static async updateQuantityOfProdcut ( cid, pid, quantity ){
+    static async updateQuantityOfProdcut ( cid, pid, quantity, uid ){
 
         const user = await UserController.getById(uid);
         const product = await ProductsManager.getById(pid);
@@ -100,7 +101,7 @@ export default class CartController {
             throw new UnauthorizedException('You cant add a product that you created');
         }
         const cart = await CartsService.getRawById(cid);
-        const existingProduct = cart.products.find( (product) => product._id === pid );
+        const existingProduct = cart.products.find( (product) => product.product._id.toString() === pid );
     
         if (!existingProduct) {
             throw new NotFoundException('Product does not exist in this cart');

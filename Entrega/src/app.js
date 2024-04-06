@@ -14,8 +14,15 @@ import config from './config/config.js';
 import authRouter from './routers/api/auth.router.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler.middleware.js'
 import { addLogger } from './config/logger.js';
+import cors from 'cors'
 
 const app = express();
+
+//CORS
+app.use(cors({
+  origin: config.front_url,
+  credentials: true
+}));
 
 app.use(cookieParser(config.cookie_secret));
 app.use(addLogger);

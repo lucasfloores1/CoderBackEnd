@@ -32,6 +32,11 @@ export default class ProductRepository {
 
     async getPaginatedProducts (criteria, options){
         const result = await this.dao.getPaginatedProducts(criteria, options);
+        //DTO Format
+        for (let i = 0; i < result.docs.length; i++) {
+            const product = new ProductDTO( result.docs[i] );
+            result.docs[i] = product;
+        }
         return result;
     }
 
